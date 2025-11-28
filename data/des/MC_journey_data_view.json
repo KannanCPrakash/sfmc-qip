@@ -1,0 +1,50 @@
+{
+  "CustomerKey": "MC_journey_data_view",
+  "Name": "MC_journey_data_view",
+  "Fields": [
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "Name": "VersionID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "Name": "JourneyID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true,
+      "Name": "JourneyName"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "VersionNumber"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "CreatedDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "LastPublishedDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "ModifiedDate"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true,
+      "Name": "JourneyStatus"
+    }
+  ]
+}

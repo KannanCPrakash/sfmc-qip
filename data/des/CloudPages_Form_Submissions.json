@@ -1,0 +1,44 @@
+{
+  "CustomerKey": "CloudPages_Form_Submissions",
+  "Name": "CloudPages_Form_Submissions",
+  "Fields": [
+    {
+      "Name": "FormID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubmissionID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "FullName",
+      "FieldType": "Text",
+      "MaxLength": 120
+    },
+    {
+      "Name": "EmailAddress",
+      "FieldType": "EmailAddress",
+      "MaxLength": 254
+    },
+    {
+      "Name": "MobileNumber",
+      "FieldType": "Phone",
+      "MaxLength": 20
+    },
+    {
+      "Name": "JSONPayload",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    },
+    {
+      "Name": "SubmittedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

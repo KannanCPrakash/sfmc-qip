@@ -1,0 +1,45 @@
+{
+  "CustomerKey": "Payment_Transactions",
+  "Name": "Payment_Transactions",
+  "Fields": [
+    {
+      "Name": "PaymentID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "PaymentDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "Amount",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    },
+    {
+      "Name": "Currency",
+      "FieldType": "Text",
+      "MaxLength": 3
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "Method",
+      "FieldType": "Text",
+      "MaxLength": 20
+    }
+  ]
+}

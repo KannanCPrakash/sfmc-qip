@@ -1,0 +1,31 @@
+{
+  "CustomerKey": "Subscription_Renewals",
+  "Name": "Subscription_Renewals",
+  "Fields": [
+    {
+      "Name": "SubscriptionID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "CurrentTermEnd",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "NextBillingDate",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "AutoRenew",
+      "FieldType": "Boolean"
+    }
+  ]
+}

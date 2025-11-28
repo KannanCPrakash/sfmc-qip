@@ -1,0 +1,18 @@
+{
+  "CustomerKey": "TestDE",
+  "Name": "TestDE",
+  "Fields": [
+    {
+      "Name": "Email",
+      "FieldType": "Text",
+      "MaxLength": 250,
+      "IsPrimaryKey": true,
+      "IsRequired": true
+    },
+    {
+      "Name": "Gender",
+      "FieldType": "Text",
+      "MaxLength": 60
+    }
+  ]
+}

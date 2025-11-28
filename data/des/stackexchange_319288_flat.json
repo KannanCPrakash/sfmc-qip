@@ -1,0 +1,30 @@
+{
+  "CustomerKey": "StackEx_Form_Example_Flat",
+  "Name": "StackEx_Form_Example_Flat",
+  "Fields": [
+    {
+      "Name": "id",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "formid",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "FullName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "UserPhone",
+      "FieldType": "Text",
+      "MaxLength": 30
+    },
+    {
+      "Name": "UserEmail",
+      "FieldType": "EmailAddress"
+    }
+  ]
+}

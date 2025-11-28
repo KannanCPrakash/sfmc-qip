@@ -1,0 +1,120 @@
+{
+  "CustomerKey": "MC_bounce_data_view",
+  "Name": "MC_bounce_data_view",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "AccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "OYBAccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "JobID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "ListID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BatchID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriberID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 128,
+      "IsRequired": true,
+      "Name": "SubscriberKey"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "EventDate"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "IsUnique"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "Name": "Domain"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BounceCategoryID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": false,
+      "Name": "BounceCategory"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "BounceSubcategoryID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": false,
+      "Name": "BounceSubcategory"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BounceTypeID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": false,
+      "Name": "BounceType"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 4000,
+      "IsRequired": false,
+      "Name": "SMTPBounceReason"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 4000,
+      "IsRequired": false,
+      "Name": "SMTPMessage"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SMTPCode"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": false,
+      "Name": "TriggererSendDefinitionObjectID"
+    },
+    {
+      "FieldType": "Text",
+      "IsRequired": false,
+      "MaxLength": 36,
+      "Name": "TriggeredSendCustomerKey"
+    }
+  ]
+}

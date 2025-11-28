@@ -1,0 +1,176 @@
+{
+  "CustomerKey": "MC_sms_message_tracking",
+  "Name": "MC_sms_message_tracking",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "MobileMessageTrackingID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "EID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "MID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true,
+      "Name": "Mobile"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "MessageID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": false,
+      "Name": "KeywordID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": false,
+      "Name": "CodeID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": false,
+      "Name": "ConversationID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "CampaignID"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "Sent"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "Delivered"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "Undelivered"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "Unsub"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "OptIn"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "OptOut"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "Outbound"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "Inbound"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "CreateDateTime"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "ModifiedDateTime"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "ActionDateTime"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 500,
+      "IsRequired": false,
+      "Name": "MessageText"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "IsTest"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "MobileMessageRecurranceID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "ResponseToMobileMessageTrackingID"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": false,
+      "Name": "IsValid"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "InvalidationCode"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendSplitID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendSegmentID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendJobID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendGroupID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SendPersonID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "SubscriberID"
+    }
+  ]
+}

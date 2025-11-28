@@ -1,0 +1,48 @@
+{
+  "CustomerKey": "Coupon_Redemptions",
+  "Name": "Coupon_Redemptions",
+  "Fields": [
+    {
+      "Name": "CouponCode",
+      "FieldType": "Text",
+      "MaxLength": 30,
+      "IsRequired": true
+    },
+    {
+      "Name": "RedemptionID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "RedeemedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "OrderID",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "DiscountAmount",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

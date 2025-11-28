@@ -1,0 +1,37 @@
+{
+  "CustomerKey": "Support_Cases",
+  "Name": "Support_Cases",
+  "Fields": [
+    {
+      "Name": "CaseNumber",
+      "FieldType": "Text",
+      "MaxLength": 18,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "Subject",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 40
+    },
+    {
+      "Name": "OpenedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "ClosedOn",
+      "FieldType": "Date"
+    }
+  ]
+}

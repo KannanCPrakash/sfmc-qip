@@ -1,0 +1,29 @@
+{
+  "CustomerKey": "SFMCGeeks_Subscriber_Sample",
+  "Name": "SFMCGeeks_Subscriber_Sample",
+  "Fields": [
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsPrimaryKey": true,
+      "IsRequired": true
+    },
+    {
+      "Name": "EmailAddress",
+      "FieldType": "EmailAddress",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "FirstName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "LastName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    }
+  ]
+}

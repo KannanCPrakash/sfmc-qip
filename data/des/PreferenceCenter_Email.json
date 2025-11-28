@@ -1,0 +1,41 @@
+{
+  "CustomerKey": "PreferenceCenter_Email",
+  "Name": "PreferenceCenter_Email",
+  "Fields": [
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "EmailAddress",
+      "FieldType": "EmailAddress",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "OptIn",
+      "FieldType": "Boolean",
+      "IsRequired": true
+    },
+    {
+      "Name": "WeeklyDigest",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "ProductUpdates",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "Events",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "LastUpdated",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

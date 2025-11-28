@@ -1,0 +1,32 @@
+{
+  "CustomerKey": "contacts",
+  "Name": "contacts",
+  "Fields": [
+    {
+      "Name": "Email",
+      "FieldType": "EmailAddress",
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "LastLogin",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "LastName",
+      "FieldType": "Text"
+    },
+    {
+      "Name": "IsActive",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "FollowerCount",
+      "FieldType": "Number"
+    },
+    {
+      "Name": "FirstName",
+      "FieldType": "Text"
+    }
+  ]
+}

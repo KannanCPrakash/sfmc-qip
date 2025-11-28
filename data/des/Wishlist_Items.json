@@ -1,0 +1,34 @@
+{
+  "CustomerKey": "Wishlist_Items",
+  "Name": "Wishlist_Items",
+  "Fields": [
+    {
+      "Name": "WishlistID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "RowID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "ProductID",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "AddedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

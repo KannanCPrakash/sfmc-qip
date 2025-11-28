@@ -1,0 +1,67 @@
+{
+  "CustomerKey": "MC_subscribers_data_view",
+  "Name": "MC_subscribers_data_view",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriberID"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "DateUndeliverable"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "DateJoined"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "DateUnsubscribed"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 250,
+      "IsRequired": false,
+      "Name": "Domain"
+    },
+    {
+      "FieldType": "EmailAddress",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "Name": "EmailAddress"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BounceCount"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "Name": "SubscriberKey"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true,
+      "Name": "SubscriberType"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 15,
+      "IsRequired": false,
+      "Name": "Status"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 5,
+      "IsRequired": false,
+      "Name": "Locale"
+    }
+  ]
+}

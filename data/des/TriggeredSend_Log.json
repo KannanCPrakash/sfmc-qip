@@ -1,0 +1,52 @@
+{
+  "CustomerKey": "TriggeredSend_Log",
+  "Name": "TriggeredSend_Log",
+  "Fields": [
+    {
+      "Name": "TSID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "TriggeredSendKey",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "EmailAddress",
+      "FieldType": "EmailAddress",
+      "MaxLength": 254
+    },
+    {
+      "Name": "RequestedDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "SentDate",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 30
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

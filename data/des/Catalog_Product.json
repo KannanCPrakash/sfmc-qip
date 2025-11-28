@@ -1,0 +1,51 @@
+{
+  "CustomerKey": "Catalog_Product",
+  "Name": "Catalog_Product",
+  "Fields": [
+    {
+      "Name": "ProductID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SKU",
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": true
+    },
+    {
+      "Name": "Name",
+      "FieldType": "Text",
+      "MaxLength": 200,
+      "IsRequired": true
+    },
+    {
+      "Name": "Category",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "Price",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    },
+    {
+      "Name": "InStock",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "ImageURL",
+      "FieldType": "Text",
+      "MaxLength": 500
+    },
+    {
+      "Name": "Description",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    }
+  ]
+}

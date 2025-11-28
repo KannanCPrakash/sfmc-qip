@@ -1,0 +1,4 @@
+-- Date operations
+SELECT *
+FROM _Bounce
+WHERE EventDate BETWEEN DATEADD(MONTH,-1,GETDATE()) AND GETDATE();

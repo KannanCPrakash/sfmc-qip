@@ -1,0 +1,46 @@
+{
+  "CustomerKey": "MC_KeywordOptIn_Log",
+  "Name": "MC_KeywordOptIn_Log",
+  "Fields": [
+    {
+      "Name": "MobileNumber",
+      "FieldType": "Phone",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "Keyword",
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": true
+    },
+    {
+      "Name": "ShortCode",
+      "FieldType": "Text",
+      "MaxLength": 15
+    },
+    {
+      "Name": "OptInDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "Source",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 20
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "ObjectBased",
+    "RowBasedRetention": false,
+    "RetentionPeriod": 30,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": true,
+    "DeleteAtEndOfRetentionPeriod": true
+  }
+}

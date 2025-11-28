@@ -1,0 +1,1 @@
+SELECT e.SubscriberId, e.Status, e.DateJoined, e.DateUnsubscribed, e.EmailAddress, e.BounceCount AS Bounces, COUNT(d.SubscriberID) AS 'Sent' FROM _Subscribers e LEFT JOIN _Sent d ON e.SubscriberID = d.SubscriberID GROUP BY e.SubscriberID, e.Status, e.DateJoined, e.DateUnsubscribed, e.EmailAddress, e.BounceCount HAVING COUNT(d.SubscriberID) > 0

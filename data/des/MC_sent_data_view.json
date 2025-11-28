@@ -1,0 +1,65 @@
+{
+  "CustomerKey": "MC_sent_data_view",
+  "Name": "_Sent",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "AccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "OYBAccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "JobID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "ListID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BatchID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriberID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "Name": "SubscriberKey"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "EventDate"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 128,
+      "IsRequired": true,
+      "Name": "Domain"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": false,
+      "Name": "TriggererSendDefinitionObjectID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": false,
+      "Name": "TriggeredSendCustomerKey"
+    }
+  ]
+}

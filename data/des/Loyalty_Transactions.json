@@ -1,0 +1,40 @@
+{
+  "CustomerKey": "Loyalty_Transactions",
+  "Name": "Loyalty_Transactions",
+  "Fields": [
+    {
+      "Name": "TxnID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "MemberID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "TxnDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "Type",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "Points",
+      "FieldType": "Number",
+      "IsRequired": true
+    },
+    {
+      "Name": "Reference",
+      "FieldType": "Text",
+      "MaxLength": 100
+    }
+  ]
+}

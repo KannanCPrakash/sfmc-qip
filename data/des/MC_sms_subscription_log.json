@@ -1,0 +1,72 @@
+{
+  "CustomerKey": "MC_sms_subscription_log",
+  "Name": "MC_sms_subscription_log",
+  "Fields": [
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "LogDate"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "MobileSubscriptionID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriptionDefinitionID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true,
+      "Name": "MobileNumber"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "OptOutStatusID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "OptOutMethodID"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "OptOutDate"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "OptInStatusID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "OptInMethodID"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "OptInDate"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "Source"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "CreatedDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "ModifiedDate"
+    }
+  ]
+}

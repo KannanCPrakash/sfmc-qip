@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body,
+        html,
+        #root {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #1a1a1a;
+            font-family: var(--vscode-font-family);
+        }
+
+        #root {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import React from 'https://esm.sh/react@18';
+        import ReactDOM from 'https://esm.sh/react-dom@18';
+        import ReactFlow, { MiniMap, Controls, Background } from 'https://esm.sh/reactflow@11';
+        import 'https://esm.sh/reactflow@11/dist/style.css';
+
+        const nodes = window.qipNodes || [];
+        const edges = window.qipEdges || [];
+        // Listen for data from extension
+        window.addEventListener('message', (event) => {
+            const msg = event.data;
+            if (msg.command === 'render') {
+                window.qipNodes = msg.nodes;
+                window.qipEdges = msg.edges;
+                // Re-render
+                ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+            }
+        });
+
+        // Signal ready
+        window.parent.postMessage({ command: 'ready' }, '*');
+
+        const App = () => (
+            <ReactFlow nodes={nodes} edges={edges} fitView>
+                <MiniMap nodeColor="#8b5cf6" />
+                <Controls />
+                <Background color="#333" gap={16} />
+            </ReactFlow>
+        );
+
+        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+    </script>
+</body>
+
+</html>

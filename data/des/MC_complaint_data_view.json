@@ -1,0 +1,58 @@
+{
+  "CustomerKey": "MC_complaint_data_view",
+  "Name": "MC_complaint_data_view",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "AccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": false,
+      "Name": "OYBAccountID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "JobID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "ListID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BatchID"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriberID"
+    },
+    {
+      "FieldType": "EmailAddress",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "Name": "SubscriberKey"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "EventDate"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "IsUnique"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 128,
+      "IsRequired": true,
+      "Name": "Domain"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "CustomerKey": "SendClassification_Map",
+  "Name": "SendClassification_Map",
+  "Fields": [
+    {
+      "Name": "SendClassKey",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "Name",
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true
+    },
+    {
+      "Name": "SenderProfileKey",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "DeliveryProfileKey",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "CANSPAMClassification",
+      "FieldType": "Text",
+      "MaxLength": 36
+    }
+  ]
+}

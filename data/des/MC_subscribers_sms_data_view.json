@@ -1,0 +1,59 @@
+{
+  "CustomerKey": "MC_subscribers_sms_data_view",
+  "Name": "MC_subscribers_sms_data_view",
+  "Fields": [
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "SubscriberId"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true,
+      "Name": "SubscriberKey"
+    },
+    {
+      "FieldType": "Phone",
+      "MaxLength": 50,
+      "IsRequired": true,
+      "Name": "MobileNumber"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "TransactionalOptIn"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "TransactionalOptInDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "TransactionalOptOutDate"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "MarketingOptIn"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "MarketingOptInDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "MarketingOptOutDate"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 50,
+      "IsRequired": true,
+      "Name": "SmsCarrierName"
+    }
+  ]
+}

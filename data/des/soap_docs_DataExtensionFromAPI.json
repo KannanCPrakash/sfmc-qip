@@ -1,0 +1,34 @@
+{
+  "CustomerKey": "DataExtensionFromAPI",
+  "Name": "DataExtensionFromAPI",
+  "Fields": [
+    {
+      "Name": "EmailAddress",
+      "FieldType": "EmailAddress",
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "ChannelUser",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "ChannelUser_EmailAddress",
+      "FieldType": "EmailAddress"
+    },
+    {
+      "Name": "Demographic_Address",
+      "FieldType": "Text",
+      "MaxLength": 200
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

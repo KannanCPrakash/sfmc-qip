@@ -1,0 +1,43 @@
+{
+  "CustomerKey": "Coupon_Issuance",
+  "Name": "Coupon_Issuance",
+  "Fields": [
+    {
+      "Name": "CouponCode",
+      "FieldType": "Text",
+      "MaxLength": 30,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "IssuedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "ExpiresOn",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "Redeemed",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "RedeemedOn",
+      "FieldType": "Date"
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

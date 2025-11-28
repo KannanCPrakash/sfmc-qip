@@ -1,0 +1,33 @@
+{
+  "CustomerKey": "Feedback_Submissions",
+  "Name": "Feedback_Submissions",
+  "Fields": [
+    {
+      "Name": "FeedbackID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "Channel",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "Comments",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    },
+    {
+      "Name": "SubmittedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

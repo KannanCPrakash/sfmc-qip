@@ -1,0 +1,41 @@
+{
+  "CustomerKey": "Ecom_Orders",
+  "Name": "Ecom_Orders",
+  "Fields": [
+    {
+      "Name": "OrderID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "OrderDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "OrderTotal",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    },
+    {
+      "Name": "Currency",
+      "FieldType": "Text",
+      "MaxLength": 3
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 30
+    }
+  ]
+}

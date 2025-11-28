@@ -1,0 +1,42 @@
+{
+  "CustomerKey": "MC_journey_activity_data_view",
+  "Name": "MC_journey_activity_data_view",
+  "Fields": [
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "Name": "VersionID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "Name": "ActivityID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": false,
+      "Name": "ActivityName"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true,
+      "Name": "ActivityExternalKey"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": false,
+      "Name": "JourneyActivityObjectID"
+    },
+    {
+      "FieldType": "Text",
+      "MaxLength": 256,
+      "IsRequired": false,
+      "Name": "ActivityType"
+    }
+  ]
+}

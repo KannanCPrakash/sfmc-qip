@@ -1,0 +1,10 @@
+{
+  "CustomerKey": "StackEx_Form_Example_RawJSON",
+  "Name": "StackEx_Form_Example_RawJSON",
+  "Fields": [
+    {
+      "Name": "payload",
+      "FieldType": "Text"
+    }
+  ]
+}

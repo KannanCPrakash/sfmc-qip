@@ -1,0 +1,52 @@
+{
+  "CustomerKey": "API_AuditLog",
+  "Name": "API_AuditLog",
+  "Fields": [
+    {
+      "Name": "RequestID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "Endpoint",
+      "FieldType": "Text",
+      "MaxLength": 200,
+      "IsRequired": true
+    },
+    {
+      "Name": "Method",
+      "FieldType": "Text",
+      "MaxLength": 10,
+      "IsRequired": true
+    },
+    {
+      "Name": "IntegrationName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "RequestTime",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "StatusCode",
+      "FieldType": "Number"
+    },
+    {
+      "Name": "ErrorMessage",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "CustomerKey": "Ecom_CartItems",
+  "Name": "Ecom_CartItems",
+  "Fields": [
+    {
+      "Name": "CartID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "RowID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "ProductID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "Quantity",
+      "FieldType": "Number",
+      "IsRequired": true
+    },
+    {
+      "Name": "UnitPrice",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "ObjectBased",
+    "RowBasedRetention": false,
+    "RetentionPeriod": 30,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": true,
+    "DeleteAtEndOfRetentionPeriod": true
+  }
+}

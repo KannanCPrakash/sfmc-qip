@@ -1,0 +1,30 @@
+{
+  "CustomerKey": "ListSubscribers_Custom",
+  "Name": "ListSubscribers_Custom",
+  "Fields": [
+    {
+      "Name": "ListID",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "LastModified",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "CustomerKey": "PreferenceCenter_SMS",
+  "Name": "PreferenceCenter_SMS",
+  "Fields": [
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "MobileNumber",
+      "FieldType": "Phone",
+      "MaxLength": 20
+    },
+    {
+      "Name": "MarketingOptIn",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "TransactionalOptIn",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "LastUpdated",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+SELECT
+Columns
+  , SUM(CASE WHEN p.COLUMN_NAME IS NOT NULL THEN 1 ELSE 0 END) AS COLUMN_NAME
+
+FROM (
+    SELECT
+    'one' as Columns
+    , pp.COLUMN_NAME
+
+    FROM ORIGINAL_DE pp
+    ) p
+
+GROUP BY 
+Columns

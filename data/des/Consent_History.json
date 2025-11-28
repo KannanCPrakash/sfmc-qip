@@ -1,0 +1,58 @@
+{
+  "CustomerKey": "Consent_History",
+  "Name": "Consent_History",
+  "Fields": [
+    {
+      "Name": "ConsentID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "Channel",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "OptIn",
+      "FieldType": "Boolean",
+      "IsRequired": true
+    },
+    {
+      "Name": "Method",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "Source",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "Timestamp",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "CapturedIP",
+      "FieldType": "Text",
+      "MaxLength": 45
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "CustomerKey": "DataExtension_ObjectRetention",
+  "Name": "DataExtension_ObjectRetention",
+  "Fields": [
+    {
+      "Name": "Id",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsPrimaryKey": true,
+      "IsRequired": true
+    },
+    {
+      "Name": "CreatedOn",
+      "FieldType": "Date"
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "ObjectBased",
+    "RowBasedRetention": false,
+    "RetentionPeriod": 30,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": true,
+    "DeleteAtEndOfRetentionPeriod": true
+  }
+}

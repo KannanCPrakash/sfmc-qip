@@ -1,0 +1,76 @@
+{
+  "CustomerKey": "SendLog_Custom",
+  "Name": "SendLog_Custom",
+  "Fields": [
+    {
+      "Name": "JobID",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "BatchID",
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254,
+      "IsRequired": true
+    },
+    {
+      "Name": "SendToAddress",
+      "FieldType": "EmailAddress",
+      "MaxLength": 254
+    },
+    {
+      "Name": "EmailName",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "SubjectLine",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "SendTime",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "IsTriggeredSend",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "TriggeredSendCustomerKey",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "CampaignID",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "JourneyName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "ActivityName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

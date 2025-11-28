@@ -1,0 +1,37 @@
+{
+  "CustomerKey": "Ecom_Cart",
+  "Name": "Ecom_Cart",
+  "Fields": [
+    {
+      "Name": "CartID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "UpdatedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "CartTotal",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "ObjectBased",
+    "RowBasedRetention": false,
+    "RetentionPeriod": 30,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": true,
+    "DeleteAtEndOfRetentionPeriod": true
+  }
+}

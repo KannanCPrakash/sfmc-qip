@@ -1,0 +1,31 @@
+{
+  "CustomerKey": "Loyalty_Members",
+  "Name": "Loyalty_Members",
+  "Fields": [
+    {
+      "Name": "MemberID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "Tier",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "PointsBalance",
+      "FieldType": "Number"
+    },
+    {
+      "Name": "EnrolledOn",
+      "FieldType": "Date"
+    }
+  ]
+}

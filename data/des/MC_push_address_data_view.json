@@ -1,0 +1,181 @@
+{
+  "CustomerKey": "MC_push_address_data_view",
+  "Name": "MC_push_address_data_view",
+  "Fields": [
+    {
+      "Name": "CreatedBy",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "PlatformVersion",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "CreatedDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "OptOutStatusID",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "OptInStatusID",
+      "FieldType": "Text",
+      "IsRequired": true,
+      "MaxLength": 100
+    },
+    {
+      "Name": "Alias",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "ProviderToken",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "Status",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "DeviceID",
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true
+    },
+    {
+      "Name": "Badge",
+      "FieldType": "Number"
+    },
+    {
+      "Name": "IsHonorDST",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "LocationEnabled",
+      "FieldType": "Boolean"
+    },
+    {
+      "Name": "ZipCode",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "SourceObjectId",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "City",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "Platform",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "TimeZone",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "State",
+      "FieldType": "Text",
+      "MaxLength": 200
+    },
+    {
+      "Name": "HardwareId",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "OptOutDate",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "UTCOffset",
+      "FieldType": "Decimal",
+      "MaxLength": 4,
+      "Scale": 2
+    },
+    {
+      "Name": "DeviceType",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "FirstName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "ModifiedBy",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "OptInMethodID",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "Device",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "Channel",
+      "FieldType": "Text",
+      "MaxLength": 20
+    },
+    {
+      "Name": "OptInDate",
+      "FieldType": "Date"
+    },
+    {
+      "Name": "APID",
+      "FieldType": "Text",
+      "MaxLength": 38,
+      "IsRequired": true
+    },
+    {
+      "Name": "SystemToken",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    },
+    {
+      "Name": "OptOutMethodID",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "ModifiedDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "LastName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "ContactID",
+      "FieldType": "Text",
+      "IsRequired": true,
+      "MaxLength": 100
+    },
+    {
+      "Name": "Source",
+      "FieldType": "Text",
+      "MaxLength": 100
+    }
+  ]
+}

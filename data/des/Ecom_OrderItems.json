@@ -1,0 +1,49 @@
+{
+  "CustomerKey": "Ecom_OrderItems",
+  "Name": "Ecom_OrderItems",
+  "Fields": [
+    {
+      "Name": "OrderID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "ItemID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "ProductID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true
+    },
+    {
+      "Name": "SKU",
+      "FieldType": "Text",
+      "MaxLength": 50
+    },
+    {
+      "Name": "Quantity",
+      "FieldType": "Number",
+      "IsRequired": true
+    },
+    {
+      "Name": "UnitPrice",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    },
+    {
+      "Name": "LineTotal",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2,
+      "IsRequired": true
+    }
+  ]
+}

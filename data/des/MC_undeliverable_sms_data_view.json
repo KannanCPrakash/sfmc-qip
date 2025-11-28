@@ -1,0 +1,32 @@
+{
+  "CustomerKey": "MC_undeliverable_sms_data_view",
+  "Name": "MC_undeliverable_sms_data_view",
+  "Fields": [
+    {
+      "FieldType": "Text",
+      "MaxLength": 20,
+      "IsRequired": true,
+      "Name": "MobileNumber"
+    },
+    {
+      "FieldType": "Boolean",
+      "IsRequired": true,
+      "Name": "Undeliverable"
+    },
+    {
+      "FieldType": "Number",
+      "IsRequired": true,
+      "Name": "BounceCount"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": true,
+      "Name": "FirstBounceDate"
+    },
+    {
+      "FieldType": "Date",
+      "IsRequired": false,
+      "Name": "HoldDate"
+    }
+  ]
+}

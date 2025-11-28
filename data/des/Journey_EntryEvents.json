@@ -1,0 +1,39 @@
+{
+  "CustomerKey": "Journey_EntryEvents",
+  "Name": "Journey_EntryEvents",
+  "Fields": [
+    {
+      "Name": "EntryID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "JourneyName",
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true
+    },
+    {
+      "Name": "ActivityName",
+      "FieldType": "Text",
+      "MaxLength": 100
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "EntryDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "Source",
+      "FieldType": "Text",
+      "MaxLength": 100
+    }
+  ]
+}

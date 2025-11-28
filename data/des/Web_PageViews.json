@@ -1,0 +1,52 @@
+{
+  "CustomerKey": "Web_PageViews",
+  "Name": "Web_PageViews",
+  "Fields": [
+    {
+      "Name": "EventID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "SessionID",
+      "FieldType": "Text",
+      "MaxLength": 36
+    },
+    {
+      "Name": "PageURL",
+      "FieldType": "Text",
+      "MaxLength": 500,
+      "IsRequired": true
+    },
+    {
+      "Name": "Referrer",
+      "FieldType": "Text",
+      "MaxLength": 500
+    },
+    {
+      "Name": "UserAgent",
+      "FieldType": "Text",
+      "MaxLength": 400
+    },
+    {
+      "Name": "EventDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "RowBased",
+    "RowBasedRetention": true,
+    "RetentionPeriod": 180,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": false,
+    "DeleteAtEndOfRetentionPeriod": false
+  }
+}

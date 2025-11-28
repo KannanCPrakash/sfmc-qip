@@ -1,0 +1,41 @@
+{
+  "CustomerKey": "AbandonedCart_Tracking",
+  "Name": "AbandonedCart_Tracking",
+  "Fields": [
+    {
+      "Name": "CartID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "AbandonedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    },
+    {
+      "Name": "ItemCount",
+      "FieldType": "Number"
+    },
+    {
+      "Name": "CartValue",
+      "FieldType": "Decimal",
+      "MaxLength": 12,
+      "Scale": 2
+    }
+  ],
+  "DataRetention": {
+    "RetentionType": "ObjectBased",
+    "RowBasedRetention": false,
+    "RetentionPeriod": 30,
+    "RetentionPeriodUnitOfMeasure": "Days",
+    "ResetRetentionPeriodOnImport": true,
+    "DeleteAtEndOfRetentionPeriod": true
+  }
+}

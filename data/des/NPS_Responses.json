@@ -1,0 +1,33 @@
+{
+  "CustomerKey": "NPS_Responses",
+  "Name": "NPS_Responses",
+  "Fields": [
+    {
+      "Name": "ResponseID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "NPSScore",
+      "FieldType": "Number",
+      "IsRequired": true
+    },
+    {
+      "Name": "Comment",
+      "FieldType": "Text",
+      "MaxLength": 4000
+    },
+    {
+      "Name": "SubmittedOn",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}

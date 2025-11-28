@@ -1,0 +1,16 @@
+{
+  "CustomerKey": "CDAP_SFMC_Sink_Sample",
+  "Name": "CDAP_SFMC_Sink_Sample",
+  "Fields": [
+    {
+      "Name": "Email",
+      "FieldType": "EmailAddress",
+      "IsRequired": true
+    },
+    {
+      "Name": "Gender",
+      "FieldType": "Text",
+      "MaxLength": 60
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "CustomerKey": "Journey_ExitEvents",
+  "Name": "Journey_ExitEvents",
+  "Fields": [
+    {
+      "Name": "ExitID",
+      "FieldType": "Text",
+      "MaxLength": 36,
+      "IsRequired": true,
+      "IsPrimaryKey": true
+    },
+    {
+      "Name": "JourneyName",
+      "FieldType": "Text",
+      "MaxLength": 100,
+      "IsRequired": true
+    },
+    {
+      "Name": "Reason",
+      "FieldType": "Text",
+      "MaxLength": 200,
+      "IsRequired": true
+    },
+    {
+      "Name": "SubscriberKey",
+      "FieldType": "Text",
+      "MaxLength": 254
+    },
+    {
+      "Name": "ExitDate",
+      "FieldType": "Date",
+      "IsRequired": true
+    }
+  ]
+}
