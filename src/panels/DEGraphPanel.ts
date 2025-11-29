@@ -136,6 +136,38 @@ export class DEGraphPanel {
     `;
     }
 
+    private normalize(name: string): string {
+        return name.toLowerCase()
+            .replace(/[_-\s\[\]'"]/g, '')
+            .replace(/de$/i, '')
+            .replace(/^ent\.|_de$|_dataview$/gi, '')
+            .replace(/dataextension/gi, '')
+            .trim();
+    }
+
+    private extractTables(sql: string): string[] {
+        const lower = sql.toLowerCase();
+        const tables = new Set<string>();
+
+        // FROM and JOIN
+        const fromJoin = [...lower.matchAll(/(?:from|join)\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
+        fromJoin.forEach(m => tables.add(this.normalize(m[1])));
+
+        // Subqueries in WHERE/EXISTS
+        const subqueries = [...lower.matchAll(/exists\s*\(\s*select.*?from\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
+        subqueries.forEach(m => tables.add(this.normalize(m[1])));
+
+        // Any word that matches a known DE (aggressive fallback)
+        const words = lower.match(/[\w\._]+/g) || [];
+        words.forEach(word => {
+            if (word.length > 2 && !['select', 'from', 'join', 'where', 'and', 'or', 'inner', 'left', 'on'].includes(word)) {
+                tables.add(this.normalize(word));
+            }
+        });
+
+        return Array.from(tables);
+    }
+
     /**
      * Sets up an event listener to listen for messages passed from the webview context and
      * executes code based on the message that is recieved.
@@ -154,43 +186,97 @@ export class DEGraphPanel {
                         // Code that should run in response to the hello message command
                         window.showInformationMessage(text);
                         return;
+                    case 'nodeClick':
+                        window.showInformationMessage(`Clicked: ${JSON.stringify(message.label)}\n${message.sql || ''}`);
+                        return;
                     case "refreshNodesAndEdges":
                         // Code that should run in response to the refreshNodes message command
                         window.showInformationMessage("Refresh nodes command received.");
                         const deFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'des', '*.json'), { windowsPathsNoEscape: true });
                         const des: DE[] = deFiles.map(f => JSON.parse(fs.readFileSync(f, 'utf8')));
-                        const nodes = des.map((d, index) => ({
-                            id: d.CustomerKey || d.Name,
-                            data: { label: d.Name, isDataView: d.Fields.some(f => f.FieldType.toLowerCase() === 'dataview') },
-                            position: { x: (index % 10) * 200, y: Math.floor(index / 10) * 100 },
-                        }));
-                                  
+
+                        //Obsolete
+                        // const nodes = des.map((d, index) => ({
+                        //     id: d.CustomerKey || d.Name,
+                        //     data: { label: d.Name, isDataView: d.Fields.some(f => f.FieldType.toLowerCase() === 'dataview') },
+                        //     position: { x: (index % 10) * 200, y: Math.floor(index / 10) * 100 },
+                        // }));
+
                         const sqlFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'queries', '*.sql'), { windowsPathsNoEscape: true });
+
+                        const deNodes: any[] = [];
+                        const queryNodes: any[] = [];
                         const edges: any[] = [];
 
+                        // === DE NODES (Purple) ===
+                        des.forEach(de => {
+                            deNodes.push({
+                                id: `de-${de.CustomerKey || de.Name}`,
+                                type: 'default',
+                                data: { label: de.Name, type: 'DE' },
+                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
+                                style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' }
+                            });
+                        });
+
+                        // === QUERY NODES + EDGES (Orange) ===
+                        sqlFiles.forEach((file, idx) => {
+                            const sql = fs.readFileSync(file, 'utf8');
+                            const queryName = path.basename(file, '.sql').replace(/_/g, ' ').slice(0, 30);
+
+                            const queryId = `query-${idx}`;
+                            queryNodes.push({
+                                id: queryId,
+                                type: 'default',
+                                data: { label: `Query: ${queryName}`, sql, type: 'Query' },
+                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
+                                style: { background: '#ea580c', color: 'white', border: '2px solid #f97316' }
+                            });
+
+                            // Connect this query to every DE it touches
+                            const tables = this.extractTables(sql);
+                            tables.forEach(tableNorm => {
+                                const de = des.find(d => this.normalize(d.Name) === tableNorm);
+                                if (de) {
+                                    edges.push({
+                                        id: `${queryId}→de-${de.Name}`,
+                                        source: queryId,
+                                        target: `de-${de.CustomerKey || de.Name}`,
+                                        animated: true,
+                                        style: { stroke: '#f97316', strokeWidth: 2 },
+                                        label: 'uses',
+                                        labelStyle: { fill: '#fff', fontSize: 10 }
+                                    });
+                                }
+                            });
+                        });
+
+                        // === DE-to-DE edges (from JOINs) ===
                         sqlFiles.forEach(file => {
                             const sql = fs.readFileSync(file, 'utf8').toLowerCase();
-                            const tables: string[] = [];
-                            const from = [...sql.matchAll(/from\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
-                            const join = [...sql.matchAll(/join\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
-                            [...from, ...join].forEach(m => tables.push(m[1].replace(/[\[\]`"]/g, '')));
+                            const tables = this.extractTables(sql);
                             for (let i = 0; i < tables.length; i++) {
                                 for (let j = i + 1; j < tables.length; j++) {
-                                    const a = des.find(d => d.Name === tables[i]);
-                                    const b = des.find(d => d.Name === tables[j]);
+                                    const a = des.find(d => this.normalize(d.Name) === tables[i]);
+                                    const b = des.find(d => this.normalize(d.Name) === tables[j]);
                                     if (a && b) {
-                                        edges.push({
-                                            id: `${a.Name}-${b.Name}`,
-                                            source: a.CustomerKey || a.Name,
-                                            target: b.CustomerKey || b.Name,
-                                            animated: true,
-                                            style: { stroke: '#8b5cf6' }
-                                        });
+                                        const edgeId = `de-${a.Name}---de-${b.Name}`;
+                                        if (!edges.some(e => e.id === edgeId)) {
+                                            edges.push({
+                                                id: edgeId,
+                                                source: `de-${a.CustomerKey || a.Name}`,
+                                                target: `de-${b.CustomerKey || b.Name}`,
+                                                style: { stroke: '#8b5cf6', strokeWidth: 3 },
+                                                animated: false
+                                            });
+                                        }
                                     }
                                 }
                             }
                         });
-                        webview.postMessage({ command: 'updateNodesAndEdges', nodes: nodes , edges: edges });
+
+                        const allNodes = [...deNodes, ...queryNodes];
+                        webview.postMessage({ command: 'updateNodesAndEdges', nodes: allNodes, edges: edges });
                         return;
 
                     // Add more switch case statements here as more webview message commands

@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
 import DEGraph from './components/DEGraph';
 import { vscode } from "./utilities/vscode";
-
+import {
+  type Node,
+} from 'reactflow';
 function App() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+
+  const handleNodeClick = (node: Node) => {
+    vscode.postMessage({
+      command: "nodeClick",
+      label: node.data.label
+    });
+  }
 
   useEffect(() => {
     const onMsg = (event: MessageEvent) => {
@@ -35,7 +44,7 @@ function App() {
           });
         }}>Refresh Data</button>
 
-        <DEGraph nodes={nodes} edges={edges} />
+        <DEGraph initialNodes={nodes} initialEdges={edges} onNodeClick={handleNodeClick} />
       </div>
 
     </>
