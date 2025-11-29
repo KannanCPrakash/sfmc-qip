@@ -276,6 +276,15 @@ export class DEGraphPanel {
                         });
 
                         const allNodes = [...deNodes, ...queryNodes];
+
+                        //extract nodes without edges and assign them to a "orphan" folder
+                        const connectedNodeIds = new Set(edges.flatMap(e => [e.source, e.target]));
+                        allNodes.forEach(node => {
+                            if (!connectedNodeIds.has(node.id)) {
+                                node.data.folder = 'Orphan';
+                            }
+                        });
+
                         webview.postMessage({ command: 'updateNodesAndEdges', nodes: allNodes, edges: edges });
                         return;
 

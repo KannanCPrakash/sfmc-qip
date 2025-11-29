@@ -36,7 +36,7 @@ function App() {
   return (
     <>
       <div>
-        <h1>SFMC QIP DE Graph</h1>
+        <h1>SFMC QIP DE Graph1</h1>
         <button onClick={() => {
           vscode.postMessage({
             command: "refreshNodesAndEdges",

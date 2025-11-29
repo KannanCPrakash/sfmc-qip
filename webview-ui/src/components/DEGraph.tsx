@@ -1,5 +1,5 @@
 // src/components/DEGraph.tsx
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   type Node,
   type Edge,
@@ -23,42 +23,79 @@ interface DEGraphProps {
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
-  direction = nodes.length > 80 ? 'LR' : 'TB'; // auto-switch
-  const nodeWidth = 220;
-  const nodeHeight = 90;
+const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+  const dagreGraph = new dagre.graphlib.Graph(
+    {
+      multigraph: true,
+      compound: true
+    }
+  );
 
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  // 1. Force vertical layout + way more generous spacing
   dagreGraph.setGraph({
-    rankdir: direction,        // 'TB' = top-to-bottom (recommended)
-    nodesep: 80,               // horizontal spacing between nodes
-    ranksep: 180,               // vertical spacing between ranks
-    marginx: 50,
-    marginy: 50,
-    ranker: 'tight-tree',      // best for lineage trees
+    rankdir: 'TB',          // Top → Bottom = vertical scrolling (sanity restored)
+    ranksep: 120,           // vertical distance between ranks
+    nodesep: 50,            // horizontal distance between nodes in same rank
+    edgesep: 20,
+
+    // 2. This is the secret sauce most people miss
+    ranker: 'longest-path', // instead of default 'network-simplex'
+    // longest-path creates much tighter, more logical groups
+    // and prevents the “everyone on two lines” disease
+
+    // 3. Align nodes nicely inside each rank
+    align: 'UL',            // Upper-Left alignment = neat columns instead of zigzag
+    //compound: true,        // Enable compound nodes for clustering THIS UNLOCKS setParent()
   });
 
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
+  dagreGraph.setDefaultNodeLabel(() => ({ width: 180, height: 60 }));
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-  edges.forEach((edge) => {
+  //4. Pre-processing: add dummy “cluster anchor” nodes (2 lines of code!)
+  function addClusterAnchors(nodes: Node[], g: dagre.graphlib.Graph): void {
+    const clusters: Record<string, string> = {};
+
+    nodes.forEach((node: Node) => {
+      // Simple heuristic — group by prefix or folder (you probably already have this logic)
+      const group = node.id.startsWith('DE_')
+        ? node.id.split('_')[1].split('-')[0]            // e.g. DE_Segmentation → "Segmentation"
+        : (node.data as any).folder || 'Queries';        // or use your real folder name
+
+      if (!clusters[group]) {
+        clusters[group] = `cluster_${group}`;
+        // Invisible anchor node that forces everything in the group to stay together
+        g.setNode(clusters[group], {
+          cluster: true,
+          width: 0, height: 0,
+          style: 'opacity:0',
+          label: ''
+        });
+      }
+      console.log(`${JSON.stringify(clusters)}`)
+      // Parent the real node to the invisible anchor
+      g.setParent(node.id, clusters[group]);
+    });
+  }
+
+  nodes.forEach(node => {
+    dagreGraph.setNode(node.id, { width: 220, height: 90 });
+  });
+  edges.forEach(edge => {
     dagreGraph.setEdge(edge.source, edge.target);
   });
 
+  addClusterAnchors(nodes, dagreGraph);
   dagre.layout(dagreGraph);
 
-  const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
+  return nodes.map(node => {
+    const { x, y } = dagreGraph.node(node.id);
     return {
       ...node,
-      position: {
-        x: nodeWithPosition.x - nodeWidth / 2 + Math.random() * 20, // tiny jitter = prettier
-        y: nodeWithPosition.y - nodeHeight / 2,
-      },
+      position: { x: x - 110, y: y - 45 },
+      // We'll control visibility with `hidden` instead of removing
     };
   });
-
-  return { nodes: layoutedNodes, edges };
 };
 
 const nodeTypes = {
@@ -107,6 +144,8 @@ const nodeTypes = {
 };
 
 const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeClick }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'DE' | 'Query'>('all');
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -118,7 +157,8 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
   );
 
   useEffect(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+    // 1. Apply layout to ALL nodes first (stable positions)
+    const layoutedNodes = getLayoutedElements(
       initialNodes.map(n => ({
         ...n,
         type: n.data.type === 'DE' ? 'deNode' : 'queryNode',
@@ -126,12 +166,65 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
       initialEdges
     );
 
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-  }, [initialNodes, initialEdges, setNodes, setEdges]);
+    // 2. Then filter visibility (but keep positions!)
+    const filteredNodes = layoutedNodes.map(node => {
+      const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = filterType === 'all' || node.data.type === (filterType === 'DE' ? 'deNode' : 'queryNode');
+      const isVisible = matchesSearch && matchesType;
+
+      return {
+        ...node,
+        hidden: !isVisible,
+        data: { ...node.data, hidden: !isVisible },
+      };
+    });
+
+    // 3. Hide edges that connect only hidden nodes
+    const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
+    const filteredEdges = initialEdges.filter(edge =>
+      visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
+    );
+
+    setNodes(filteredNodes);
+    setEdges(filteredEdges);
+
+  }, [searchTerm, filterType, initialNodes, initialEdges]);
 
   return (
-    <div style={{ width: '100%', height: '100vh', background: '#0a0a0a' }}>
+    <div style={{ width: '100%', height: '100vh', position: 'relative', background: '#0a0a0a' }}>
+      <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 10, display: 'flex', gap: 12, background: '#111', padding: 12, borderRadius: 12, border: '1px solid #333' }}>
+        <input
+          type="text"
+          placeholder="Search nodes (e.g. SubscriberKey)"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{ padding: '10px', borderRadius: 8, border: '1px solid #444', background: '#1e1e1e', color: 'white', width: 260, fontSize: 14 }}
+        />
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={filterType === 'all'}
+            onChange={e => setFilterType(e.target.checked ? 'all' : 'all')}
+          />
+          All
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={filterType === 'DE'}
+            onChange={e => setFilterType(e.target.checked ? 'DE' : 'all')}
+          />
+          Data Extensions
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={filterType === 'Query'}
+            onChange={e => setFilterType(e.target.checked ? 'Query' : 'all')}
+          />
+          Queries
+        </label>
+      </div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -144,7 +237,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
           padding: 0.25,             // 25% padding around graph
           includeHiddenNodes: false,
           minZoom: 0.2,
-          maxZoom: 2,
+          maxZoom: 5,
         }}
         minZoom={0.1}
         maxZoom={4}
