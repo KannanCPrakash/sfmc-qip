@@ -11,8 +11,8 @@ import ReactFlow, {
   Handle,
   Position,
 } from 'reactflow';
-import dagre from 'dagre';
 import 'reactflow/dist/style.css';
+import ELK from 'elkjs/lib/elk.bundled.js';
 
 interface DEGraphProps {
   initialNodes: Node[];
@@ -20,82 +20,70 @@ interface DEGraphProps {
   onNodeClick?: (node: Node) => void;
 }
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
+// Initialize ELK once
+const elk = new ELK();
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
-  const dagreGraph = new dagre.graphlib.Graph(
-    {
-      multigraph: true,
-      compound: true
-    }
-  );
+const elkLayoutOptions = {
+  'elk.algorithm': 'layered',
+  'elk.direction': 'DOWN',
+  'elk.spacing.baseValue': '100',
+  'elk.layered.spacing.nodeNodeBetweenLayers': '120',
+  'elk.spacing.nodeNode': '80',
+  'elk.layered.nodePlacement.strategy': 'LINEAR_SEGMENTS',     // ← This gives you real 2D grid!
+  'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+  'elk.layered.crossingMinimization.semiInteractive': 'true',
+  'elk.partitioning.activate': 'true',                        // Auto swimlanes by group!
+  'elk.layered.thoroughness': '50',
+  'elk.edgeRouting': 'ORTHOGONAL',
+  'elk.layered.edgeRouting.orthogonal': 'true',
+};
 
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  // 1. Force vertical layout + way more generous spacing
-  dagreGraph.setGraph({
-    rankdir: 'TB',          // Top → Bottom = vertical scrolling (sanity restored)
-    ranksep: 120,           // vertical distance between ranks
-    nodesep: 50,            // horizontal distance between nodes in same rank
-    edgesep: 20,
+const getLayoutedElements = async (nodes: Node[], edges: Edge[]) => {
+  const elkNodes = nodes.map(node => ({
+    id: node.id,
+    width: 240,
+    height: 100,
+    // Optional: pass group info to ELK for better clustering
+    properties: {
+      'elk.nodeLabels.placement': 'INSIDE V_CENTER H_CENTER',
+    },
+  }));
 
-    // 2. This is the secret sauce most people miss
-    ranker: 'longest-path', // instead of default 'network-simplex'
-    // longest-path creates much tighter, more logical groups
-    // and prevents the “everyone on two lines” disease
+  const elkEdges = edges.map((edge, i) => ({
+    id: `e${i}`,
+    sources: [edge.source],
+    targets: [edge.target],
+  }));
 
-    // 3. Align nodes nicely inside each rank
-    align: 'UL',            // Upper-Left alignment = neat columns instead of zigzag
-    //compound: true,        // Enable compound nodes for clustering THIS UNLOCKS setParent()
-  });
+  const graph = {
+    id: 'root',
+    layoutOptions: elkLayoutOptions,
+    children: elkNodes,
+    edges: elkEdges,
+  };
 
-  dagreGraph.setDefaultNodeLabel(() => ({ width: 180, height: 60 }));
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  try {
+    const layoutedGraph = await elk.layout(graph);
 
-  //4. Pre-processing: add dummy “cluster anchor” nodes (2 lines of code!)
-  function addClusterAnchors(nodes: Node[], g: dagre.graphlib.Graph): void {
-    const clusters: Record<string, string> = {};
-
-    nodes.forEach((node: Node) => {
-      // Simple heuristic — group by prefix or folder (you probably already have this logic)
-      const group = node.id.startsWith('DE_')
-        ? node.id.split('_')[1].split('-')[0]            // e.g. DE_Segmentation → "Segmentation"
-        : (node.data as any).folder || 'Queries';        // or use your real folder name
-
-      if (!clusters[group]) {
-        clusters[group] = `cluster_${group}`;
-        // Invisible anchor node that forces everything in the group to stay together
-        g.setNode(clusters[group], {
-          cluster: true,
-          width: 0, height: 0,
-          style: 'opacity:0',
-          label: ''
-        });
+    return nodes.map(node => {
+      const elkNode = layoutedGraph.children?.find(n => n.id === node.id);
+      if (!elkNode?.x || !elkNode?.y) {
+        console.warn('Node not layouted:', node.id);
+        return { ...node, position: { x: 0, y: 0 } };
       }
-      console.log(`${JSON.stringify(clusters)}`)
-      // Parent the real node to the invisible anchor
-      g.setParent(node.id, clusters[group]);
+
+      return {
+        ...node,
+        position: {
+          x: elkNode.x - (elkNode.width || 240) / 2,
+          y: elkNode.y - (elkNode.height || 100) / 2,
+        },
+      };
     });
+  } catch (error) {
+    console.error('ELK layout failed', error);
+    return nodes.map(n => ({ ...n, position: { x: 0, y: 0 } }));
   }
-
-  nodes.forEach(node => {
-    dagreGraph.setNode(node.id, { width: 220, height: 90 });
-  });
-  edges.forEach(edge => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  addClusterAnchors(nodes, dagreGraph);
-  dagre.layout(dagreGraph);
-
-  return nodes.map(node => {
-    const { x, y } = dagreGraph.node(node.id);
-    return {
-      ...node,
-      position: { x: x - 110, y: y - 45 },
-      // We'll control visibility with `hidden` instead of removing
-    };
-  });
 };
 
 const nodeTypes = {
@@ -157,38 +145,38 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
   );
 
   useEffect(() => {
-    // 1. Apply layout to ALL nodes first (stable positions)
-    const layoutedNodes = getLayoutedElements(
-      initialNodes.map(n => ({
+    const applyLayout = async () => {
+      const nodesWithType = initialNodes.map(n => ({
         ...n,
         type: n.data.type === 'DE' ? 'deNode' : 'queryNode',
-      })),
-      initialEdges
-    );
+      }));
 
-    // 2. Then filter visibility (but keep positions!)
-    const filteredNodes = layoutedNodes.map(node => {
-      const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = filterType === 'all' || node.data.type === (filterType === 'DE' ? 'deNode' : 'queryNode');
-      const isVisible = matchesSearch && matchesType;
+      const layoutedNodes = await getLayoutedElements(nodesWithType, initialEdges);
 
-      return {
-        ...node,
-        hidden: !isVisible,
-        data: { ...node.data, hidden: !isVisible },
-      };
-    });
+      const filteredNodes = layoutedNodes.map(node => {
+        const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = filterType === 'all' ||
+          (filterType === 'DE' && node.data.type === 'deNode') ||
+          (filterType === 'Query' && node.data.type === 'queryNode');
 
-    // 3. Hide edges that connect only hidden nodes
-    const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
-    const filteredEdges = initialEdges.filter(edge =>
-      visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
-    );
+        return {
+          ...node,
+          hidden: !(matchesSearch && matchesType),
+          data: { ...node.data, hidden: !(matchesSearch && matchesType) },
+        };
+      });
 
-    setNodes(filteredNodes);
-    setEdges(filteredEdges);
+      const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
+      const filteredEdges = initialEdges.filter(edge =>
+        visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
+      );
 
-  }, [searchTerm, filterType, initialNodes, initialEdges]);
+      setNodes(filteredNodes);
+      setEdges(filteredEdges);
+    };
+
+    applyLayout();
+  }, [searchTerm, filterType, initialNodes, initialEdges, setNodes, setEdges]);
 
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative', background: '#0a0a0a' }}>
@@ -208,7 +196,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
           />
           All
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#a78bfa', cursor: 'pointer' }}>
           <input
             type="checkbox"
             checked={filterType === 'DE'}
@@ -216,7 +204,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
           />
           Data Extensions
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#ea580c', cursor: 'pointer' }}>
           <input
             type="checkbox"
             checked={filterType === 'Query'}
