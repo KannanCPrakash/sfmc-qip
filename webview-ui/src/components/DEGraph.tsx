@@ -136,6 +136,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
   const [filterType, setFilterType] = useState<'all' | 'DE' | 'Query'>('all');
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [isLayouting, setIsLayouting] = useState(false);
 
   const onNodeClickHandler = useCallback(
     (_: any, node: Node) => {
@@ -146,33 +147,38 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
 
   useEffect(() => {
     const applyLayout = async () => {
-      const nodesWithType = initialNodes.map(n => ({
-        ...n,
-        type: n.data.type === 'DE' ? 'deNode' : 'queryNode',
-      }));
+      setIsLayouting(true);  // ← Spinner ON
+      try {
+        const nodesWithType = initialNodes.map(n => ({
+          ...n,
+          type: n.data.type === 'DE' ? 'deNode' : 'queryNode',
+        }));
 
-      const layoutedNodes = await getLayoutedElements(nodesWithType, initialEdges);
+        const layoutedNodes = await getLayoutedElements(nodesWithType, initialEdges);
 
-      const filteredNodes = layoutedNodes.map(node => {
-        const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesType = filterType === 'all' ||
-          (filterType === 'DE' && node.data.type === 'deNode') ||
-          (filterType === 'Query' && node.data.type === 'queryNode');
+        const filteredNodes = layoutedNodes.map(node => {
+          const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesType = filterType === 'all' ||
+            (filterType === 'DE' && node.data.type === 'deNode') ||
+            (filterType === 'Query' && node.data.type === 'queryNode');
 
-        return {
-          ...node,
-          hidden: !(matchesSearch && matchesType),
-          data: { ...node.data, hidden: !(matchesSearch && matchesType) },
-        };
-      });
+          return {
+            ...node,
+            hidden: !(matchesSearch && matchesType),
+            data: { ...node.data, hidden: !(matchesSearch && matchesType) },
+          };
+        });
 
-      const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
-      const filteredEdges = initialEdges.filter(edge =>
-        visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
-      );
+        const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
+        const filteredEdges = initialEdges.filter(edge =>
+          visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
+        );
 
-      setNodes(filteredNodes);
-      setEdges(filteredEdges);
+        setNodes(filteredNodes);
+        setEdges(filteredEdges);
+      } finally {
+        setIsLayouting(false); // ← Spinner OFF
+      }
     };
 
     applyLayout();
@@ -213,6 +219,39 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
           Queries
         </label>
       </div>
+
+      {isLayouting && (
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(10, 10, 10, 0.92)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 5, // lower than the search panel (which uses zIndex: 10)
+          backdropFilter: 'blur(4px)',
+        }} aria-hidden="true" role="status">
+          <div style={{
+            width: 64,
+            height: 64,
+            border: '5px solid #1a1a1a',
+            borderTop: '5px solid #a78bfa',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginBottom: 24,
+          }} />
+          <div style={{ color: '#a78bfa', fontSize: 16, fontWeight: 600 }}>
+            Arranging your data universe...
+          </div>
+          <style>{`
+            @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}

@@ -5,3 +5,4 @@ node_modules
 *.vsix
 .vscode/
 webview-ui/build/
+webview-ui/build/assets/index.js
