@@ -36,13 +36,14 @@ function App() {
   return (
     <>
       <div>
-        <h1>SFMC QIP DE Graph1</h1>
+        <h1>SFMC Query Intelligence Platform DE Graph</h1>
+        
         <button onClick={() => {
           vscode.postMessage({
             command: "refreshNodesAndEdges",
             text: "refreshNodesAndEdges",
           });
-        }}>Refresh Data</button>
+        }}>Load Sample Data</button>
 
         <DEGraph initialNodes={nodes} initialEdges={edges} onNodeClick={handleNodeClick} />
       </div>

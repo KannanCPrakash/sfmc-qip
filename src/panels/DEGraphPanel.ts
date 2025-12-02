@@ -208,17 +208,6 @@ export class DEGraphPanel {
                         const queryNodes: any[] = [];
                         const edges: any[] = [];
 
-                        // === DE NODES (Purple) ===
-                        des.forEach(de => {
-                            deNodes.push({
-                                id: `de-${de.CustomerKey || de.Name}`,
-                                type: 'default',
-                                data: { label: de.Name, type: 'DE' },
-                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
-                                style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' }
-                            });
-                        });
-
                         // === QUERY NODES + EDGES (Orange) ===
                         sqlFiles.forEach((file, idx) => {
                             const sql = fs.readFileSync(file, 'utf8');
@@ -275,17 +264,77 @@ export class DEGraphPanel {
                             }
                         });
 
-                        const allNodes = [...deNodes, ...queryNodes];
 
-                        //extract nodes without edges and assign them to a "orphan" folder
-                        const connectedNodeIds = new Set(edges.flatMap(e => [e.source, e.target]));
-                        allNodes.forEach(node => {
-                            if (!connectedNodeIds.has(node.id)) {
-                                node.data.folder = 'Orphan';
+
+                        const pkConnections = new Map<string, string[]>(); // "SubscriberKey" → [DE1, DE2...]
+
+                        des.forEach(de => {
+                            const pkField = de.Fields.find((f: any) =>
+                                f.IsPrimaryKey ||
+                                f.Name.toLowerCase().includes('subscriberkey') ||
+                                f.Name.toLowerCase() === 'contactkey' ||
+                                f.Name.toLowerCase() === 'subscriberid'
+                            );
+
+                            if (pkField) {
+                                const pkName = pkField.Name;
+                                if (!pkConnections.has(pkName)) { pkConnections.set(pkName, []); }
+                                pkConnections.get(pkName)!.push(de.Name);
                             }
                         });
 
-                        webview.postMessage({ command: 'updateNodesAndEdges', nodes: allNodes, edges: edges });
+                        // Now find foreign keys (exact name match)
+                        const fkEdges: any[] = [];
+                        const deToFkCount = new Map<string, number>();
+
+                        des.forEach(de => {
+                            let count = 0;
+                            de.Fields.forEach((field: any) => {
+                                if (pkConnections.has(field.Name)) {
+                                    const sources = pkConnections.get(field.Name)!;
+                                    count += sources.filter(src => src !== de.Name).length;
+                                    sources.forEach(sourceDEName => {
+                                        if (sourceDEName !== de.Name) { // avoid self-loop
+                                            fkEdges.push({
+                                                id: `fk-${sourceDEName}-${de.Name}-${field.Name}`,
+                                                source: `de-${sourceDEName}`,
+                                                target: `de-${de.Name}`,
+                                                //type: 'smoothstep',
+                                                animated: true,
+                                                //style: { stroke: '#fbbf24', strokeWidth: 4, strokeDasharray: '8 4' },
+                                                // label: `FK: ${field.Name}`,
+                                                // labelStyle: { fill: '#fbbf24', fontWeight: 700, fontSize: 11 },
+                                                // labelBgPadding: [8, 4],
+                                                // labelBgBorderRadius: 4,
+                                                // labelBgStyle: { fill: '#1f2937' },
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                            deToFkCount.set(de.Name, count);
+                        });
+
+                        // === DE NODES (Purple) ===
+                        des.forEach(de => {
+                            deNodes.push({
+                                id: `de-${de.CustomerKey || de.Name}`,
+                                type: 'default',
+                                data: {
+                                    label: de.Name,
+                                    type: 'DE',
+                                    pkField: de.Fields.find(f => f.IsPrimaryKey)?.Name || null,
+                                    fkCount: deToFkCount.get(de.Name) || 0
+                                },
+                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
+                                style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' }
+                            });
+                        });
+
+                        //TODO: Adding FK Edges causes postion reset issue
+                        const allEdges = [...edges];//,...fkEdges];
+                        const allNodes = [...deNodes, ...queryNodes];
+                        webview.postMessage({ command: 'updateNodesAndEdges', nodes: allNodes, edges: allEdges });
                         return;
 
                     // Add more switch case statements here as more webview message commands
