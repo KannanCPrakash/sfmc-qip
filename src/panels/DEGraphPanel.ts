@@ -191,16 +191,9 @@ export class DEGraphPanel {
                         return;
                     case "refreshNodesAndEdges":
                         // Code that should run in response to the refreshNodes message command
-                        window.showInformationMessage("Refresh nodes command received.");
+                        window.showInformationMessage("Loading DE and Query Nodes. Constructing edges...");
                         const deFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'des', '*.json'), { windowsPathsNoEscape: true });
                         const des: DE[] = deFiles.map(f => JSON.parse(fs.readFileSync(f, 'utf8')));
-
-                        //Obsolete
-                        // const nodes = des.map((d, index) => ({
-                        //     id: d.CustomerKey || d.Name,
-                        //     data: { label: d.Name, isDataView: d.Fields.some(f => f.FieldType.toLowerCase() === 'dataview') },
-                        //     position: { x: (index % 10) * 200, y: Math.floor(index / 10) * 100 },
-                        // }));
 
                         const sqlFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'queries', '*.sql'), { windowsPathsNoEscape: true });
 
@@ -263,8 +256,6 @@ export class DEGraphPanel {
                                 }
                             }
                         });
-
-
 
                         const pkConnections = new Map<string, string[]>(); // "SubscriberKey" → [DE1, DE2...]
 

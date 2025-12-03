@@ -13,12 +13,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import ELK from 'elkjs/lib/elk.bundled.js';
-
-interface DEGraphProps {
-  initialNodes: Node[];
-  initialEdges: Edge[];
-  onNodeClick?: (node: Node) => void;
-}
+import { vscode } from "../utilities/vscode";
 
 // Initialize ELK once
 const elk = new ELK();
@@ -156,36 +151,39 @@ const nodeTypes = {
   ),
 };
 
-const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeClick }) => {
+const DEGraph: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'DE' | 'Query'>('all');
+  const [masterNodes, setMasterNodes] = useState<Node[]>([]);
+  const [masterEdges, setMasterEdges] = useState<Edge[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);  
   const [isLayouting, setIsLayouting] = useState(false);
 
   const onNodeClickHandler = useCallback(
     (_: any, node: Node) => {
-      onNodeClick?.(node);
-    },
-    [onNodeClick]
-  );
+      vscode.postMessage({
+        command: "nodeClick",
+        label: node.data.label
+      });
+    }, []);
 
   useEffect(() => {
     const applyLayout = async () => {
       setIsLayouting(true);  // ← Spinner ON
       try {
-        const nodesWithType = initialNodes.map(n => ({
+        const nodesWithType = masterNodes.map(n => ({
           ...n,
           type: n.data.type === 'DE' ? 'deNode' : 'queryNode',
         }));
 
-        const layoutedNodes = await getLayoutedElements(nodesWithType, initialEdges);
+        const layoutedNodes = await getLayoutedElements(nodesWithType, masterEdges);
 
         const filteredNodes = layoutedNodes.map(node => {
           const matchesSearch = node.data.label.toLowerCase().includes(searchTerm.toLowerCase());
           const matchesType = filterType === 'all' ||
-            (filterType === 'DE' && node.data.type === 'deNode') ||
-            (filterType === 'Query' && node.data.type === 'queryNode');
+            (filterType === 'DE' && node.data.type === 'DE') ||
+            (filterType === 'Query' && node.data.type === 'Query');
 
           return {
             ...node,
@@ -195,7 +193,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
         });
 
         const visibleNodeIds = new Set(filteredNodes.filter(n => !n.hidden).map(n => n.id));
-        const filteredEdges = initialEdges.filter(edge =>
+        const filteredEdges = masterEdges.filter(edge =>
           visibleNodeIds.has(edge.source) || visibleNodeIds.has(edge.target)
         );
 
@@ -206,8 +204,22 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
       }
     };
 
+    const onMsg = (event: MessageEvent) => {
+      //console.log("Message received from extension:", event.data);
+      const message = event.data;
+      switch (message.command) {
+        case 'updateNodesAndEdges':
+          setMasterNodes(message.nodes);
+          setMasterEdges(message.edges);
+          break;
+      }
+    };
+    window.addEventListener('message', onMsg);
     applyLayout();
-  }, [searchTerm, filterType, initialNodes, initialEdges, setNodes, setEdges]);
+    return () => {
+      window.removeEventListener('message', onMsg);
+    };
+  }, [searchTerm, filterType, masterNodes, masterEdges, setNodes, setEdges]);
 
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative', background: '#0a0a0a' }}>
@@ -245,38 +257,70 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
         </label>
       </div>
 
-      {isLayouting && (
-        <div style={{
+      <button
+        onClick={() => {
+          setIsLayouting(true);
+          vscode.postMessage({
+            command: "refreshNodesAndEdges",
+            text: "refreshNodesAndEdges",
+          });
+        }}
+        style={{
           position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(10, 10, 10, 0.92)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 5, // lower than the search panel (which uses zIndex: 10)
-          backdropFilter: 'blur(4px)',
-        }} aria-hidden="true" role="status">
+          top: 20,
+          right: 20,
+          zIndex: 10,
+          padding: '10px 20px',
+          background: '#6366f1',
+          color: 'white',
+          border: 'none',
+          borderRadius: 8,
+          fontWeight: 600,
+          fontSize: 14,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+        }}
+        // onMouseEnter={e => (e.currentTarget.style.background = '#4f46e5')}
+        // onMouseLeave={e => (e.currentTarget.style.background = '#6366f1')}
+      >
+        Load Sample Data
+      </button>
+
+      {
+        isLayouting && (
           <div style={{
-            width: 64,
-            height: 64,
-            border: '5px solid #1a1a1a',
-            borderTop: '5px solid #a78bfa',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: 24,
-          }} />
-          <div style={{ color: '#a78bfa', fontSize: 16, fontWeight: 600 }}>
-            Arranging your data universe...
-          </div>
-          <style>{`
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(10, 10, 10, 0.92)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 5, // lower than the search panel (which uses zIndex: 10)
+            backdropFilter: 'blur(4px)',
+          }} aria-hidden="true" role="status">
+            <div style={{
+              width: 64,
+              height: 64,
+              border: '5px solid #1a1a1a',
+              borderTop: '5px solid #a78bfa',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              marginBottom: 24,
+            }} />
+            <div style={{ color: '#a78bfa', fontSize: 16, fontWeight: 600 }}>
+              Arranging your data universe...
+            </div>
+            <style>{`
             @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
             }
           `}</style>
-        </div>
-      )}
+          </div>
+        )
+      }
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -311,7 +355,7 @@ const DEGraph: React.FC<DEGraphProps> = ({ initialNodes, initialEdges, onNodeCli
           pannable
         />
       </ReactFlow>
-    </div>
+    </div >
   );
 };
 
