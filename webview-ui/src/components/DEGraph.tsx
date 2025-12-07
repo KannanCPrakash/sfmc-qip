@@ -8,12 +8,12 @@ import ReactFlow, {
   Background,
   useNodesState,
   useEdgesState,
-  Handle,
-  Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import { vscode } from "../utilities/vscode";
+import { DENode } from './DENode';
+import { QueryNode } from './QueryNode';
 
 // Initialize ELK once
 const elk = new ELK();
@@ -82,73 +82,8 @@ const getLayoutedElements = async (nodes: Node[], edges: Edge[]) => {
 };
 
 const nodeTypes = {
-  deNode: ({ data }: any) => {
-    const hasPK = data.pkField;
-    return (
-      <div
-        style={{
-          padding: '12px 16px',
-          background: '#4c1d95',
-          color: 'white',
-          borderRadius: 12,
-          minWidth: 140,
-          textAlign: 'center',
-          fontWeight: '600',
-          cursor: 'pointer',
-          border: hasPK ? '4px solid #f59e0b' : '3px solid #a78bfa',
-          boxShadow: hasPK ? '0 0 20px rgba(251, 191, 36, 0.6)' : '0 6px 20px rgba(0,0,0,0.4)'
-        }}
-      >
-        <div style={{ fontSize: 13 }}>{data.label}</div>
-        {hasPK && (
-          <div style={{ fontSize: 10, color: '#fcd34d', marginTop: 4 }}>
-            Primary Key: {hasPK}
-          </div>
-        )}
-        {data.fkCount > 0 && (
-          <div style={{
-            position: 'absolute',
-            top: -12,
-            right: -12,
-            background: '#f59e0b',
-            color: 'black',
-            fontWeight: 'bold',
-            fontSize: 11,
-            padding: '4px 8px',
-            borderRadius: 20,
-            border: '3px solid #451a03',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.6)'
-          }}>
-            {data.fkCount}
-          </div>
-        )}
-        <div style={{ fontSize: 10, opacity: 0.8, marginTop: 4 }}>Data Extension</div>
-        <Handle type="target" position={Position.Top} />
-        <Handle type="source" position={Position.Bottom} />
-      </div>
-    )
-  },
-  queryNode: ({ data }: any) => (
-    <div
-      style={{
-        padding: '12px 16px',
-        background: '#ea580c',
-        color: 'white',
-        borderRadius: 12,
-        border: '3px solid #fb923c',
-        minWidth: 160,
-        textAlign: 'center',
-        fontWeight: '600',
-        boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
-        cursor: 'pointer',
-      }}
-    >
-      <div style={{ fontSize: 12 }}>{data.label}</div>
-      <div style={{ fontSize: 9, opacity: 0.8, marginTop: 4 }}>Query Activity</div>
-      <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  ),
+  DENode,
+  QueryNode
 };
 
 const DEGraph: React.FC = () => {
@@ -157,11 +92,11 @@ const DEGraph: React.FC = () => {
   const [masterNodes, setMasterNodes] = useState<Node[]>([]);
   const [masterEdges, setMasterEdges] = useState<Edge[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);  
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isLayouting, setIsLayouting] = useState(false);
 
   const onNodeClickHandler = useCallback(
-    (_: any, node: Node) => {
+    (_event: React.MouseEvent | React.TouchEvent, node: Node) => {
       vscode.postMessage({
         command: "nodeClick",
         label: node.data.label
@@ -281,8 +216,8 @@ const DEGraph: React.FC = () => {
           transition: 'all 0.2s ease',
           boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
         }}
-        // onMouseEnter={e => (e.currentTarget.style.background = '#4f46e5')}
-        // onMouseLeave={e => (e.currentTarget.style.background = '#6366f1')}
+      // onMouseEnter={e => (e.currentTarget.style.background = '#4f46e5')}
+      // onMouseLeave={e => (e.currentTarget.style.background = '#6366f1')}
       >
         Load Sample Data
       </button>
