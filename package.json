@@ -17,7 +17,25 @@
         "command": "sfmc-qip.showGraph",
         "title": "QIP: Show DE Graph"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "sfmc-qip.showGraph",
+          "group": "z_commands",              
+          "when": "resourceExtname =~ /\\.(sql|json|txt)$/i || resourceFilename =~ /_DE_|Query/i",
+          "title": "QIP: Show DE ↔ Query Graph"    
+        }
+      ],      
+      "explorer/context/multi": [
+        {
+          "command": "sfmc-qip.showGraph",
+          "when": "resourceExtname =~ /\\.(sql|json)$/i",
+          "group": "navigation",
+          "alt": "sfmc-qip.showGraph"
+        }
+      ]
+    }
   },
   "scripts": {
     "install:all": "npm install && cd webview-ui && npm install",
