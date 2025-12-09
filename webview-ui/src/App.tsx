@@ -1,5 +1,6 @@
 
 import DEGraph from './components/DEGraph';
+import './App.css'
 
 function App() {
 
