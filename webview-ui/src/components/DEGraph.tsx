@@ -282,6 +282,8 @@ const DEGraph: React.FC = () => {
           isOpen={flyoutOpen}
           onClose={() => setFlyoutOpen(false)}
           node={selectedNode}
+          nodes={nodes}
+          edges={edges}
         />
       </div>
     </div>

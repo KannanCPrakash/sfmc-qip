@@ -1,17 +1,22 @@
 // FlyoutPanel.tsx
 import React, { useEffect, useRef } from 'react';
 import { X, Pin, PinOff } from 'lucide-react';
-import type { Node as FlowNode } from 'reactflow';
 import { SQLEditor } from './SQLEditor';
 import { ImpactList } from './ImpactList';
+import {
+  type Node as FlowNode,
+  type Edge as FlowEdge
+} from 'reactflow';
 
 interface FlyoutPanelProps {
   isOpen: boolean;
   onClose: () => void;
   node: FlowNode | null;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
 }
 
-export function FlyoutPanel({ isOpen, onClose, node }: FlyoutPanelProps) {
+export function FlyoutPanel({ isOpen, onClose, node, nodes, edges }: FlyoutPanelProps) {
   const [pinned, setPinned] = React.useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +25,8 @@ export function FlyoutPanel({ isOpen, onClose, node }: FlyoutPanelProps) {
     if (!isOpen || pinned) return;
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+      // Only proceed if the click target is a DOM Node (not a React Flow Node)
+      if (panelRef.current && e.target instanceof Node && !panelRef.current.contains(e.target)) {
         onClose();
       }
     };
@@ -42,9 +48,9 @@ export function FlyoutPanel({ isOpen, onClose, node }: FlyoutPanelProps) {
   // };
   //}
 
-  if (!isOpen || !node ) return null;
+  if (!isOpen || !node) return null;
 
-  const isQuery = node.type === 'query';
+  const isQuery = node.data.type === 'Query';
   const title = isQuery ? node.data.label : `${node.data.label} (Data Extension)`;
   const sql = isQuery ? node.data.sql || '-- No SQL found' : '-- This is a Data Extension';
 
@@ -88,34 +94,23 @@ export function FlyoutPanel({ isOpen, onClose, node }: FlyoutPanelProps) {
 
       {/* Body */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {isQuery ? (
-          <>
-            <div className="flex-1 overflow-hidden">
-              <SQLEditor sql={sql} />
-            </div>
-            <div className="border-t border-gray-800">
-              <ImpactList />
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center p-8 text-center">
-            <div>
-              <div className="text-5xl font-bold text-indigo-400 mb-2">47</div>
-              <div className="text-gray-400">queries touch this DE</div>
-              <div className="text-xs text-gray-600 mt-6">Full details next week 🔥</div>
-            </div>
-          </div>
-        )}
+        {isQuery && (
+          <div className="flex-1 overflow-hidden">
+            <SQLEditor sqlQuery={sql} />
+          </div>)}
+        <div className="border-t border-gray-800">
+          <ImpactList node={node} nodes={nodes} edges={edges} />
+        </div>
       </div>
 
       {/* Paste-to-validate footer */}
-      {isQuery && (
+      {/* {isQuery && (
         <div className="p-4 border-t border-gray-800">
           <button className="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition shadow-lg shadow-indigo-500/20">
-            Paste New SQL → Validate Instantly
+            Paste New SQL → Validate Instantly           
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
