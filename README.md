@@ -43,4 +43,4 @@ Star this repo if you're hyped. Feedback? Open an issue.
 
 MIT License — Fork, contribute, build on it.
 
-Made with ❤️ by @KannanCPrakash — [LinkedIn](https://www.linkedin.com/in/kannancprakash/)
+Made with ❤️ by @KannanC — [LinkedIn](www.linkedin.com/in/kannancpr)
