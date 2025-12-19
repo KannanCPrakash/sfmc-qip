@@ -1,1 +1,1 @@
-export type NodeField = { name: string; type: string };
+export type NodeField = { Name: string; FieldType: string };

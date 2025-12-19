@@ -315,7 +315,8 @@ export class DEGraphPanel {
                                     label: de.Name,
                                     type: 'DE',
                                     pkField: de.Fields.find(f => f.IsPrimaryKey)?.Name || null,
-                                    fkCount: deToFkCount.get(de.Name) || 0
+                                    fkCount: deToFkCount.get(de.Name) || 0,
+                                    fields: de.Fields
                                 },
                                 position: { x: Math.random() * 1000, y: Math.random() * 800 },
                                 style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' }
