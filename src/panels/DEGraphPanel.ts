@@ -1,123 +1,67 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from "vscode";
+import {
+    Disposable, ExtensionContext, ProgressLocation,
+    Webview, WebviewPanel, window, Uri, ViewColumn, workspace,
+} from "vscode";
 import { getNonce } from "../utilities/getNonce";
 import { getUri } from "../utilities/getUri";
+import { SFMCClient, SFMCDataExtension, SFMCField } from "../sfmc/SFMCClient";
 import { globSync } from 'glob';
 import * as path from 'path';
 import * as fs from 'fs';
 
-interface DE { Name: string; CustomerKey?: string; Fields: Field[]; }
 interface Field { Name: string; FieldType: string; MaxLength?: number; IsPrimaryKey?: boolean; }
+interface DE { Name: string; CustomerKey?: string; Fields: Field[]; }
+interface Query { name: string; sql: string; }
 
-/**
- * This class manages the state and behavior of DEGraphPanel webview panels.
- *
- * It contains all the data and methods for:
- *
- * - Creating and rendering DEGraphPanel webview panels
- * - Properly cleaning up and disposing of webview resources when the panel is closed
- * - Setting the HTML (and by proxy CSS/JavaScript) content of the webview panel
- * - Setting message listeners so data can be passed between the webview and extension
- */
 export class DEGraphPanel {
     public static currentPanel: DEGraphPanel | undefined;
     private readonly _panel: WebviewPanel;
     private _disposables: Disposable[] = [];
-    private _extensionUri: Uri;
+    private readonly _context: ExtensionContext;
 
-    /**
-       * The DEGraphPanel class private constructor (called only from the render method).
-       *
-       * @param panel A reference to the webview panel
-       * @param extensionUri The URI of the directory containing the extension
-       */
-    private constructor(panel: WebviewPanel, extensionUri: Uri) {
+    private get _extensionUri(): Uri { return this._context.extensionUri; }
+
+    private constructor(panel: WebviewPanel, context: ExtensionContext) {
         this._panel = panel;
-
-        // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
-        // the panel or when the panel is closed programmatically)
+        this._context = context;
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
-        // Set the HTML content for the webview panel
-        this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
-
-        // Set an event listener to listen for messages passed from the webview context
+        this._panel.webview.html = this._getWebviewContent(this._panel.webview);
         this._setWebviewMessageListener(this._panel.webview);
-        this._extensionUri = extensionUri;
     }
 
-    /**
-     * Renders the current webview panel if it exists otherwise a new webview panel
-     * will be created and displayed.
-     *
-     * @param extensionUri The URI of the directory containing the extension.
-     */
-    public static render(extensionUri: Uri) {
+    public static render(context: ExtensionContext) {
         if (DEGraphPanel.currentPanel) {
-            // If the webview panel already exists reveal it
             DEGraphPanel.currentPanel._panel.reveal(ViewColumn.One);
         } else {
-            // If a webview panel does not already exist create and show a new one
             const panel = window.createWebviewPanel(
-                // Panel view type
                 "sfmcQip",
-                // Panel title
                 "QIP: DE Graph",
-                // The editor column the panel should be displayed in
                 ViewColumn.One,
-                // Extra panel configurations
                 {
-                    // Enable JavaScript in the webview
                     enableScripts: true,
-                    // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
                     localResourceRoots: [
-                        Uri.joinPath(extensionUri, "out"),
-                        Uri.joinPath(extensionUri, "webview-ui/build")
+                        Uri.joinPath(context.extensionUri, "out"),
+                        Uri.joinPath(context.extensionUri, "webview-ui/build"),
                     ],
                 }
             );
-
-            DEGraphPanel.currentPanel = new DEGraphPanel(panel, extensionUri);
+            DEGraphPanel.currentPanel = new DEGraphPanel(panel, context);
         }
     }
 
-    /**
-     * Cleans up and disposes of webview resources when the webview panel is closed.
-     */
     public dispose() {
         DEGraphPanel.currentPanel = undefined;
-
-        // Dispose of the current webview panel
         this._panel.dispose();
-
-        // Dispose of all disposables (i.e. commands) for the current webview panel
         while (this._disposables.length) {
-            const disposable = this._disposables.pop();
-            if (disposable) {
-                disposable.dispose();
-            }
+            this._disposables.pop()?.dispose();
         }
     }
 
-    /**
-     * Defines and returns the HTML that should be rendered within the webview panel.
-     *
-     * @remarks This is also the place where references to the React webview build files
-     * are created and inserted into the webview HTML.
-     *
-     * @param webview A reference to the extension webview
-     * @param extensionUri The URI of the directory containing the extension
-     * @returns A template string literal containing the HTML that should be
-     * rendered within the webview panel
-     */
-    private _getWebviewContent(webview: Webview, extensionUri: Uri) {
-        // The CSS file from the React build output
-        const stylesUri = getUri(webview, extensionUri, ["webview-ui", "build", "assets", "index.css"]);
-        // The JS file from the React build output
-        const scriptUri = getUri(webview, extensionUri, ["webview-ui", "build", "assets", "index.js"]);
-
+    private _getWebviewContent(webview: Webview) {
+        const stylesUri = getUri(webview, this._extensionUri, ["webview-ui", "build", "assets", "index.css"]);
+        const scriptUri = getUri(webview, this._extensionUri, ["webview-ui", "build", "assets", "index.js"]);
         const nonce = getNonce();
 
-        // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
         return /*html*/ `
       <!DOCTYPE html>
       <html lang="en">
@@ -136,9 +80,11 @@ export class DEGraphPanel {
     `;
     }
 
+    // ── Normalisation / SQL parsing ───────────────────────────────────────────
+
     private normalize(name: string): string {
         return name.toLowerCase()
-            .replace(/[_-\s\[\]'"]/g, '')
+            .replace(/[_\-\s\[\]'"]/g, '')
             .replace(/de$/i, '')
             .replace(/^ent\.|_de$|_dataview$/gi, '')
             .replace(/dataextension/gi, '')
@@ -149,16 +95,13 @@ export class DEGraphPanel {
         const lower = sql.toLowerCase();
         const tables = new Set<string>();
 
-        // FROM and JOIN
-        const fromJoin = [...lower.matchAll(/(?:from|join)\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
+        const fromJoin = [...lower.matchAll(/(?:from|join)\s+[\[\]`"]?([^,\s\[\]`"]+)[\[\]`"]?/gi)];
         fromJoin.forEach(m => tables.add(this.normalize(m[1])));
 
-        // Subqueries in WHERE/EXISTS
-        const subqueries = [...lower.matchAll(/exists\s*\(\s*select.*?from\s+[\[\]`"]?([^,\s\]\]`"]+)[\]\]`"]?/gi)];
+        const subqueries = [...lower.matchAll(/exists\s*\(\s*select.*?from\s+[\[\]`"]?([^,\s\[\]`"]+)[\[\]`"]?/gi)];
         subqueries.forEach(m => tables.add(this.normalize(m[1])));
 
-        // Any word that matches a known DE (aggressive fallback)
-        const words = lower.match(/[\w\._]+/g) || [];
+        const words = lower.match(/[\w._]+/g) ?? [];
         words.forEach(word => {
             if (word.length > 2 && !['select', 'from', 'join', 'where', 'and', 'or', 'inner', 'left', 'on'].includes(word)) {
                 tables.add(this.normalize(word));
@@ -168,169 +111,214 @@ export class DEGraphPanel {
         return Array.from(tables);
     }
 
-    /**
-     * Sets up an event listener to listen for messages passed from the webview context and
-     * executes code based on the message that is recieved.
-     *
-     * @param webview A reference to the extension webview
-     * @param context A reference to the extension context
-     */
+    // ── Graph builder (shared by sample data + live SFMC) ────────────────────
+
+    private _buildGraph(des: DE[], queries: Query[]): { nodes: any[]; edges: any[] } {
+        const deNodes: any[] = [];
+        const queryNodes: any[] = [];
+        const edges: any[] = [];
+
+        // Query nodes + query→DE edges
+        queries.forEach((q, idx) => {
+            const queryId = `query-${idx}`;
+            queryNodes.push({
+                id: queryId,
+                type: 'default',
+                data: { label: `Query: ${q.name}`, sql: q.sql, type: 'Query' },
+                position: { x: 0, y: 0 },
+                style: { background: '#ea580c', color: 'white', border: '2px solid #f97316' },
+            });
+
+            const tables = this.extractTables(q.sql);
+            tables.forEach(tableNorm => {
+                const de = des.find(d => this.normalize(d.Name) === tableNorm);
+                if (de) {
+                    edges.push({
+                        id: `${queryId}→de-${de.Name}`,
+                        source: queryId,
+                        target: `de-${de.CustomerKey || de.Name}`,
+                        animated: true,
+                        style: { stroke: '#f97316', strokeWidth: 2 },
+                        label: 'uses',
+                        labelStyle: { fill: '#fff', fontSize: 10 },
+                    });
+                }
+            });
+        });
+
+        // DE→DE edges (co-occurrence in the same SQL)
+        queries.forEach(q => {
+            const tables = this.extractTables(q.sql);
+            for (let i = 0; i < tables.length; i++) {
+                for (let j = i + 1; j < tables.length; j++) {
+                    const a = des.find(d => this.normalize(d.Name) === tables[i]);
+                    const b = des.find(d => this.normalize(d.Name) === tables[j]);
+                    if (a && b) {
+                        const edgeId = `de-${a.Name}---de-${b.Name}`;
+                        if (!edges.some(e => e.id === edgeId)) {
+                            edges.push({
+                                id: edgeId,
+                                source: `de-${a.CustomerKey || a.Name}`,
+                                target: `de-${b.CustomerKey || b.Name}`,
+                                style: { stroke: '#8b5cf6', strokeWidth: 3 },
+                                animated: false,
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
+        // FK count per DE
+        const pkConnections = new Map<string, string[]>();
+        des.forEach(de => {
+            const pkField = de.Fields.find(f =>
+                f.IsPrimaryKey ||
+                f.Name.toLowerCase().includes('subscriberkey') ||
+                f.Name.toLowerCase() === 'contactkey' ||
+                f.Name.toLowerCase() === 'subscriberid'
+            );
+            if (pkField) {
+                if (!pkConnections.has(pkField.Name)) { pkConnections.set(pkField.Name, []); }
+                pkConnections.get(pkField.Name)!.push(de.Name);
+            }
+        });
+
+        const deToFkCount = new Map<string, number>();
+        des.forEach(de => {
+            let count = 0;
+            de.Fields.forEach(field => {
+                if (pkConnections.has(field.Name)) {
+                    count += pkConnections.get(field.Name)!.filter(src => src !== de.Name).length;
+                }
+            });
+            deToFkCount.set(de.Name, count);
+        });
+
+        // DE nodes
+        des.forEach(de => {
+            deNodes.push({
+                id: `de-${de.CustomerKey || de.Name}`,
+                type: 'default',
+                data: {
+                    label: de.Name,
+                    type: 'DE',
+                    pkField: de.Fields.find(f => f.IsPrimaryKey)?.Name ?? null,
+                    fkCount: deToFkCount.get(de.Name) ?? 0,
+                    fields: de.Fields,
+                },
+                position: { x: 0, y: 0 },
+                style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' },
+            });
+        });
+
+        return { nodes: [...deNodes, ...queryNodes], edges };
+    }
+
+    // ── SFMC live fetch ───────────────────────────────────────────────────────
+
+    private async _loadFromSFMC(webview: Webview): Promise<void> {
+        const config = workspace.getConfiguration('sfmcQip');
+        const subdomain = config.get<string>('subdomain');
+        const clientId = config.get<string>('clientId');
+        const accountId = config.get<string>('accountId') || undefined;
+        const clientSecret = await this._context.secrets.get('sfmcQip.clientSecret');
+
+        if (!subdomain || !clientId || !clientSecret) {
+            const pick = await window.showErrorMessage(
+                'SFMC credentials not configured. Run "QIP: Configure SFMC Connection" first.',
+                'Configure Now'
+            );
+            if (pick === 'Configure Now') {
+                await import("vscode").then(vsc =>
+                    vsc.commands.executeCommand('sfmc-qip.configure')
+                );
+            }
+            return;
+        }
+
+        try {
+            await window.withProgress(
+                { location: ProgressLocation.Notification, title: 'QIP: Connecting to SFMC', cancellable: false },
+                async progress => {
+                    progress.report({ message: 'Authenticating...' });
+                    const client = new SFMCClient({ subdomain: subdomain!, clientId: clientId!, clientSecret: clientSecret!, accountId });
+
+                    // Validate credentials
+                    await client.getToken();
+
+                    progress.report({ message: 'Fetching Data Extensions and fields...', increment: 20 });
+                    const sfmcDEs = await client.getDataExtensions();
+
+                    progress.report({ message: `Fetched ${sfmcDEs.length} DEs. Loading Query Activities...`, increment: 50 });
+                    const sfmcQueries = await client.getQueryActivities();
+
+                    progress.report({ message: 'Building graph...', increment: 20 });
+
+                    // Map to internal types
+                    const des: DE[] = sfmcDEs.map(d => ({
+                        Name: d.Name,
+                        CustomerKey: d.CustomerKey,
+                        Fields: d.Fields as Field[],
+                    }));
+                    const queries: Query[] = sfmcQueries.map(q => ({
+                        name: q.Name.slice(0, 40),
+                        sql: q.QueryText,
+                    }));
+
+                    const { nodes, edges } = this._buildGraph(des, queries);
+                    webview.postMessage({ command: 'updateNodesAndEdges', nodes, edges });
+
+                    progress.report({ increment: 10 });
+                    window.showInformationMessage(
+                        `QIP: Loaded ${des.length} Data Extensions and ${queries.length} Query Activities.`
+                    );
+                }
+            );
+        } catch (err: any) {
+            window.showErrorMessage(`QIP: SFMC connection failed — ${err.message}`);
+        }
+    }
+
+    // ── Message listener ──────────────────────────────────────────────────────
+
     private _setWebviewMessageListener(webview: Webview) {
         webview.onDidReceiveMessage(
-            (message: any) => {
-                const command = message.command;
-                const text = message.text;
-
-                switch (command) {
+            async (message: any) => {
+                switch (message.command) {
                     case "hello":
-                        // Code that should run in response to the hello message command
-                        window.showInformationMessage(text);
+                        window.showInformationMessage(message.text);
                         return;
+
                     case 'nodeClick':
                         window.showInformationMessage(`Clicked: ${JSON.stringify(message.label)}\n${message.sql || ''}`);
                         return;
-                    case "refreshNodesAndEdges":
-                        // Code that should run in response to the refreshNodes message command
-                        window.showInformationMessage("Loading DE and Query Nodes. Constructing edges...");
-                        const deFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'des', '*.json'), { windowsPathsNoEscape: true });
+
+                    case "refreshNodesAndEdges": {
+                        window.showInformationMessage("Loading sample DE and Query nodes...");
+                        const deFiles = globSync(
+                            path.join(this._extensionUri.fsPath, 'data', 'des', '*.json'),
+                            { windowsPathsNoEscape: true }
+                        );
                         const des: DE[] = deFiles.map(f => JSON.parse(fs.readFileSync(f, 'utf8')));
 
-                        const sqlFiles = globSync(path.join(this._extensionUri.fsPath, 'data', 'queries', '*.sql'), { windowsPathsNoEscape: true });
+                        const sqlFiles = globSync(
+                            path.join(this._extensionUri.fsPath, 'data', 'queries', '*.sql'),
+                            { windowsPathsNoEscape: true }
+                        );
+                        const queries: Query[] = sqlFiles.map(f => ({
+                            name: path.basename(f, '.sql').replace(/_/g, ' ').slice(0, 40),
+                            sql: fs.readFileSync(f, 'utf8'),
+                        }));
 
-                        const deNodes: any[] = [];
-                        const queryNodes: any[] = [];
-                        const edges: any[] = [];
-
-                        // === QUERY NODES + EDGES (Orange) ===
-                        sqlFiles.forEach((file, idx) => {
-                            const sql = fs.readFileSync(file, 'utf8');
-                            const queryName = path.basename(file, '.sql').replace(/_/g, ' ').slice(0, 30);
-
-                            const queryId = `query-${idx}`;
-                            queryNodes.push({
-                                id: queryId,
-                                type: 'default',
-                                data: { label: `Query: ${queryName}`, sql, type: 'Query' },
-                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
-                                style: { background: '#ea580c', color: 'white', border: '2px solid #f97316' }
-                            });
-
-                            // Connect this query to every DE it touches
-                            const tables = this.extractTables(sql);
-                            tables.forEach(tableNorm => {
-                                const de = des.find(d => this.normalize(d.Name) === tableNorm);
-                                if (de) {
-                                    edges.push({
-                                        id: `${queryId}→de-${de.Name}`,
-                                        source: queryId,
-                                        target: `de-${de.CustomerKey || de.Name}`,
-                                        animated: true,
-                                        style: { stroke: '#f97316', strokeWidth: 2 },
-                                        label: 'uses',
-                                        labelStyle: { fill: '#fff', fontSize: 10 }
-                                    });
-                                }
-                            });
-                        });
-
-                        // === DE-to-DE edges (from JOINs) ===
-                        sqlFiles.forEach(file => {
-                            const sql = fs.readFileSync(file, 'utf8').toLowerCase();
-                            const tables = this.extractTables(sql);
-                            for (let i = 0; i < tables.length; i++) {
-                                for (let j = i + 1; j < tables.length; j++) {
-                                    const a = des.find(d => this.normalize(d.Name) === tables[i]);
-                                    const b = des.find(d => this.normalize(d.Name) === tables[j]);
-                                    if (a && b) {
-                                        const edgeId = `de-${a.Name}---de-${b.Name}`;
-                                        if (!edges.some(e => e.id === edgeId)) {
-                                            edges.push({
-                                                id: edgeId,
-                                                source: `de-${a.CustomerKey || a.Name}`,
-                                                target: `de-${b.CustomerKey || b.Name}`,
-                                                style: { stroke: '#8b5cf6', strokeWidth: 3 },
-                                                animated: false
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        });
-
-                        const pkConnections = new Map<string, string[]>(); // "SubscriberKey" → [DE1, DE2...]
-
-                        des.forEach(de => {
-                            const pkField = de.Fields.find((f: any) =>
-                                f.IsPrimaryKey ||
-                                f.Name.toLowerCase().includes('subscriberkey') ||
-                                f.Name.toLowerCase() === 'contactkey' ||
-                                f.Name.toLowerCase() === 'subscriberid'
-                            );
-
-                            if (pkField) {
-                                const pkName = pkField.Name;
-                                if (!pkConnections.has(pkName)) { pkConnections.set(pkName, []); }
-                                pkConnections.get(pkName)!.push(de.Name);
-                            }
-                        });
-
-                        // Now find foreign keys (exact name match)
-                        const fkEdges: any[] = [];
-                        const deToFkCount = new Map<string, number>();
-
-                        des.forEach(de => {
-                            let count = 0;
-                            de.Fields.forEach((field: any) => {
-                                if (pkConnections.has(field.Name)) {
-                                    const sources = pkConnections.get(field.Name)!;
-                                    count += sources.filter(src => src !== de.Name).length;
-                                    sources.forEach(sourceDEName => {
-                                        if (sourceDEName !== de.Name) { // avoid self-loop
-                                            fkEdges.push({
-                                                id: `fk-${sourceDEName}-${de.Name}-${field.Name}`,
-                                                source: `de-${sourceDEName}`,
-                                                target: `de-${de.Name}`,
-                                                //type: 'smoothstep',
-                                                animated: true,
-                                                //style: { stroke: '#fbbf24', strokeWidth: 4, strokeDasharray: '8 4' },
-                                                // label: `FK: ${field.Name}`,
-                                                // labelStyle: { fill: '#fbbf24', fontWeight: 700, fontSize: 11 },
-                                                // labelBgPadding: [8, 4],
-                                                // labelBgBorderRadius: 4,
-                                                // labelBgStyle: { fill: '#1f2937' },
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                            deToFkCount.set(de.Name, count);
-                        });
-
-                        // === DE NODES (Purple) ===
-                        des.forEach(de => {
-                            deNodes.push({
-                                id: `de-${de.CustomerKey || de.Name}`,
-                                type: 'default',
-                                data: {
-                                    label: de.Name,
-                                    type: 'DE',
-                                    pkField: de.Fields.find(f => f.IsPrimaryKey)?.Name || null,
-                                    fkCount: deToFkCount.get(de.Name) || 0,
-                                    fields: de.Fields
-                                },
-                                position: { x: Math.random() * 1000, y: Math.random() * 800 },
-                                style: { background: '#4c1d95', color: 'white', border: '2px solid #8b5cf6' }
-                            });
-                        });
-
-                        //TODO: Adding FK Edges causes postion reset issue
-                        const allEdges = [...edges];//,...fkEdges];
-                        const allNodes = [...deNodes, ...queryNodes];
-                        webview.postMessage({ command: 'updateNodesAndEdges', nodes: allNodes, edges: allEdges });
+                        const { nodes, edges } = this._buildGraph(des, queries);
+                        webview.postMessage({ command: 'updateNodesAndEdges', nodes, edges });
                         return;
+                    }
 
-                    // Add more switch case statements here as more webview message commands
-                    // are created within the webview context (i.e. inside media/main.js)
+                    case "refreshFromSFMC":
+                        await this._loadFromSFMC(webview);
+                        return;
                 }
             },
             undefined,
@@ -338,5 +326,3 @@ export class DEGraphPanel {
         );
     }
 }
-
-

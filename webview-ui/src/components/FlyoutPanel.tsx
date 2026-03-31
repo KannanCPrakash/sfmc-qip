@@ -19,9 +19,11 @@ interface FlyoutPanelProps {
 export function FlyoutPanel({ isOpen, onClose, node, nodes, edges }: FlyoutPanelProps) {
   const [pinned, setPinned] = React.useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
-
+  const [validationIssues, setValidationIssues] = React.useState<string[] | null>(null);
+  
   // Auto-close when clicking outside (unless pinned)
   useEffect(() => {
+
     if (!isOpen || pinned) return;
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -33,6 +35,27 @@ export function FlyoutPanel({ isOpen, onClose, node, nodes, edges }: FlyoutPanel
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, pinned, onClose]);
+
+
+  const runValidation = () => {
+    const issues: string[] = [];
+
+    // Same checks as before – paste them here as a local function
+    if (/;\s*$/m.test(sql)) issues.push('🚨 Trailing semicolon – remove it');
+    if (/\/\*/.test(sql) && /\*\//.test(sql)) issues.push('🚨 Block comments detected – use -- instead for Query Studio');
+    if (/^\s*\(/m.test(sql)) issues.push('🚨 Starts with ( – Query Studio hates this');
+    if (/SELECT\s+\*/i.test(sql)) issues.push('🚨 SELECT * – explicit fields only, please');
+    // ... add the rest from previous validator
+
+    const forbidden = ['UPDATE', 'INSERT', 'DELETE', 'SET'];
+    forbidden.forEach(word => {
+      if (new RegExp(`\\b${word}\\b`, 'i').test(sql)) {
+        issues.push(`🚨 Forbidden "${word}" statement`);
+      }
+    });
+
+    setValidationIssues(issues.length ? issues : []);
+  };
 
   // Uncomment for testing purposes
   // if node is null, create a dummy node for testing
@@ -95,9 +118,35 @@ export function FlyoutPanel({ isOpen, onClose, node, nodes, edges }: FlyoutPanel
       {/* Body */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {isQuery && (
-          <div className="flex-1 overflow-hidden">
-            <SQLEditor sqlQuery={sql} />
-          </div>)}
+          <div className="flex flex-col">
+            <div className="flex-1 overflow-hidden">
+              <SQLEditor sqlQuery={sql} />
+            </div>
+            <div className="actions">
+              <button onClick={runValidation} className="mb-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition duration-150 ease-in-out flex items-center gap-2">
+                🔍 Validate This Query
+              </button>
+            </div>
+          </div>
+        )}
+
+        {validationIssues !== null && (
+          <div className={`mt-4 p-4 rounded-lg border-l-4 ${validationIssues.length === 0 ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800'}`}>
+            {validationIssues.length === 0 ? (
+              <p className="font-semibold">✅ Query passed basic SFMC checks – ship it!</p>
+            ) : (
+              <>
+                <p className="font-semibold mb-2">Validation Issues Found:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {validationIssues.map((issue, i) => (
+                    <li key={i}>{issue}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="border-t border-gray-800">
           <ImpactList node={node} nodes={nodes} edges={edges} />
         </div>

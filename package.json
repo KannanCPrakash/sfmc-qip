@@ -16,8 +16,32 @@
       {
         "command": "sfmc-qip.showGraph",
         "title": "QIP: Show DE Graph"
+      },
+      {
+        "command": "sfmc-qip.configure",
+        "title": "QIP: Configure SFMC Connection"
       }
     ],
+    "configuration": {
+      "title": "SFMC QIP",
+      "properties": {
+        "sfmcQip.subdomain": {
+          "type": "string",
+          "default": "",
+          "description": "SFMC tenant subdomain (e.g. mc563885gzs27c5t9-63k636ttgm). Found in your installed package's Auth Base URI."
+        },
+        "sfmcQip.clientId": {
+          "type": "string",
+          "default": "",
+          "description": "SFMC installed package Client ID."
+        },
+        "sfmcQip.accountId": {
+          "type": "string",
+          "default": "",
+          "description": "SFMC MID (Account ID). Required when connecting to a child business unit."
+        }
+      }
+    },
     "menus": {
       "explorer/context": [
         {

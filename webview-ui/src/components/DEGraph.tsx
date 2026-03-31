@@ -196,14 +196,20 @@ const DEGraph: React.FC = () => {
           <button
             onClick={() => {
               setIsLayouting(true);
-              vscode.postMessage({
-                command: "refreshNodesAndEdges",
-                text: "refreshNodesAndEdges",
-              });
-            }}          
+              vscode.postMessage({ command: "refreshNodesAndEdges" });
+            }}
             className="z-10 py-2.5 px-5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-semibold text-sm cursor-pointer transition-all duration-200 ease-in-out shadow-lg focus:outline-none"
           >
             Load Sample Data
+          </button>
+          <button
+            onClick={() => {
+              setIsLayouting(true);
+              vscode.postMessage({ command: "refreshFromSFMC" });
+            }}
+            className="z-10 py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm cursor-pointer transition-all duration-200 ease-in-out shadow-lg focus:outline-none"
+          >
+            Load from SFMC
           </button>
         </div>
 
