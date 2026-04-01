@@ -4,5 +4,6 @@ node_modules
 .vscode-test/
 *.vsix
 .vscode/
+.sfdx/
 webview-ui/build/
 webview-ui/build/assets/index.js
